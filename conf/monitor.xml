@@ -1,0 +1,22 @@
+<monitor>
+        <name>CouchBaseMonitor</name>
+        <type>managed</type>
+        <description>CouchBase Monitor</description>
+        <monitor-configuration></monitor-configuration>
+        <monitor-run-task>
+                <execution-style>periodic</execution-style>
+                <execution-frequency-in-seconds>60</execution-frequency-in-seconds>
+                <name>CouchBase Monitor Run Task</name>
+                <display-name>CouchBase Monitor Task</display-name>
+                <description>CouchBase Monitor Task</description>
+                <type>java</type>
+                <execution-timeout-in-secs>60</execution-timeout-in-secs>
+                <java-task>
+                    <classpath>CouchBaseMonitor.jar;lib/log4j-1.2.15.jar;lib/machineagent.jar</classpath>
+                        <impl-class>com.appdynamics.monitors.couchbase.CouchBaseMonitor</impl-class>
+                </java-task>
+                <task-arguments>
+                    <argument name="hosts-config-path" is-required="true" default-value="monitors/CouchBaseMonitor/conf/HostsConfig.xml"/>
+                </task-arguments>
+        </monitor-run-task>
+</monitor>

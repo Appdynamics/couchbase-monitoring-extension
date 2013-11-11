@@ -1,0 +1,46 @@
+<project default="build">
+    <property name="build.dir" value="dist" />
+    <property name="conf.dir" value="conf" />
+    <property name="project.name" value="CouchBaseMonitor"/>
+    <property name="lib.dir" value="lib"/>
+
+    <path id="myClassPath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+        <fileset dir="${conf.dir}" includes="*.*"/>
+
+    </path>
+
+    <target name="build">
+        <mkdir dir="${build.dir}/classes"/>
+        <javac destdir="${build.dir}/classes" source="1.5" target="1.5" srcdir="src/" classpathref="myClassPath" debug="on"/>
+        <mkdir dir="${build.dir}/CouchBaseMonitor"/>
+        <mkdir dir="${build.dir}/CouchBaseMonitor/lib"/>
+        <mkdir dir="${build.dir}/CouchBaseMonitor/conf"/>
+
+        <jar destfile="${build.dir}/CouchBaseMonitor/${project.name}.jar">
+            <fileset dir="${build.dir}/classes"/>
+            <manifest>
+                <attribute name="Class-Path" value="${build.dir}/${project.name}/${project.name}.jar"/>
+            </manifest>
+        </jar>
+        <copy todir="${build.dir}/CouchBaseMonitor/lib/">
+            <fileset dir="${lib.dir}" includes="*.jar"/>
+        </copy>
+        <copy todir="${build.dir}/CouchBaseMonitor/">
+            <fileset dir="${conf.dir}" includes="monitor.xml"/>
+        </copy>
+        <copy todir="${build.dir}/CouchBaseMonitor/${conf.dir}">
+            <fileset dir="${conf.dir}" includes="*.*" excludes="monitor.xml"/>
+        </copy>
+        <delete dir="${build.dir}/classes"/>
+    </target>
+    <target name="package" depends="build">
+        <zip destfile="${build.dir}/CouchBaseMonitor.zip">
+            <zipfileset dir="${build.dir}/CouchBaseMonitor" filemode="755" prefix="CouchBaseMonitor/"/>
+        </zip>
+        <delete dir="${build.dir}/CouchBaseMonitor"/>
+    </target>
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+</project>
