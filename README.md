@@ -42,54 +42,21 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 
 ## Metrics
 
-### Metric Category: CouchBase
+### Metric Category: Cluster Metrics
 
-|Metric Name           | Description     |
-|----------------------|-----------------|
-|database_writes       | Number of times a database was changed |
-|database_reads        | Number of times a document was read from a database |
-|open_databases        | Number of open databases |
-|open_os_files         | Number of file descriptors CouchBase has open |
-|request_time          | Length of a request inside CouchBase without MochiWeb |
+|Metric Name            |
+|-----------------------|
+|ram_total        	|
+|ram_quotaUsed        	|
+|ram_usedByData         |
+|ram_quotaTotal         |
+|ram_used	        |
+|hdd_total       	|
+|hdd_used       	|
+|hdd_usedByData       	|
+|hdd_quotaTotal       	|
+|hdd_free       	|
 
-### Metric Category: httpd
-
-|Metric Name           | Description     |
-|----------------------|-----------------|
-|bulk_requests         | Number of bulk requests |
-|requests              | Number of HTTP requests |
-|temporary_view_reads  | Number of temporary view reads |
-|view_reads            | Number of view reads |
-
-### Metric Category: httpd_request_methods
-
-|Metric Name           | Description     |
-|----------------------|-----------------|
-|COPY       		   | Number of HTTP COPY requests |
-|DELETE                | Number of HTTP DELETE requests |
-|GET                   | Number of HTTP GET requests |
-|HEAD                  | Number of HTTP HEAD requests |
-|MOVE                  | Number of HTTP MOVE requests |
-|POST                  | Number of HTTP POST requests |
-|PUT                   | Number of HTTP PUT requests |
-
-### Metric Category: httpd_status_codes
-
-|Metric Name           | Description     |
-|----------------------|-----------------|
-|201       			   | Number of HTTP 200 OK responses |
-|201        		   | Number of HTTP 201 Created responses |
-|202        		   | Number of HTTP 202 Accepted responses |
-|301         		   | Number of HTTP 301 Moved Permanently responses |
-|304          		   | Number of HTTP 304 Not Modified responses |
-|400         		   | Number of HTTP 400 Bad Request responses |
-|401                   | Number of HTTP 401 Unauthorized responses|
-|403  				   | Number of HTTP 403 Forbidden responses |
-|404            	   | Number of HTTP 404 Not Found responses |
-|405       		   	   | Number of HTTP 405 Method Not Allowed responses |
-|409                   | Number of HTTP 409 Conflict responses |
-|412                   | Number of HTTP 412 Precondition Failed responses |
-|500                   | Number of  HTTP 500 Internal Server Error responses} |
 
 ## Custom Dashboard
 
