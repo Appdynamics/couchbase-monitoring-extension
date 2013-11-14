@@ -57,6 +57,34 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 |hdd_quotaTotal       	|
 |hdd_free       	|
 
+### Metric Category: Node Metrics
+
+|Metric Name            	|
+|------------------------------	|
+|memoryFree        		|
+|vb_replica_curr_items  	|
+|clusterCompatibility         	|
+|couch_docs_data_size         	|
+|mem_total	        	|
+|mcdMemoryAllocated       	|
+|mcdMemoryReserved       	|
+|uptime       			|
+|ep_bg_fetched       		|
+|mem_used       		|
+|memoryTotal        		|
+|get_hits  			|
+|curr_items         		|
+|mem_free         		|
+|cmd_get	        	|
+|couch_views_actual_disk_size   |
+|swap_used       		|
+|cpu_utilization_rate       	|
+|couch_views_data_size       	|
+|curr_items_tot       		|
+|couch_docs_actual_disk_size    |
+|swap_total       		|
+|ops       			|
+
 
 ## Custom Dashboard
 
