@@ -18,13 +18,10 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 	<li>Open &lt;machineagent install dir&gt;/monitors/CouchBaseMonitor/conf/monitor.xml and configure the CouchBase parameters.
 <p></p>
 <pre>
-	&lt;argument name="hosts-config-path" is-required="true" default-value="monitors/CouchBaseMonitor/conf/HostsConfig.xml" /&gt;          
-</pre>
-	</li>	
-	<li>Open &lt;machineagent install dir&gt;/monitors/CouchBaseMonitor/conf/HostsConfig.xml and configure the CouchBase hosts.
-<p>The host id, port, username, and password need to be configured for each host. Here is a sample configuration for one host: </p>
-<pre>
-	&lt;Host id="localhost" port="5984" username="username" password="password"/&gt;          
+	 &lt;argument name="host" is-required="false" default-value="localhost"/&gt;
+         &lt;argument name="port" is-required="false" default-value="8091"/&gt;
+         &lt;argument name="username" is-required="false" default-value="username"/&gt;
+         &lt;argument name="password" is-required="false" default-value="password"/&gt;	
 </pre>
 	</li>	
 	<li> Restart the machine agent.
@@ -100,7 +97,7 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 
 ##Contributing
 
-Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/couchedb-monitoring-extension).
+Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/couchbase-monitoring-extension).
 
 ##Community
 
