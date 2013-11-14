@@ -57,7 +57,10 @@ public class CouchBaseMonitor extends AManagedMonitor{
         metricWriter.printMetric(String.valueOf((long) metricValue.doubleValue()));
     }
 
-    @Override
+    /**
+     * Main execution method that uploads the metrics to the AppDynamics Controller
+     * @see com.singularity.ee.agent.systemagent.api.ITask#execute(java.util.Map, com.singularity.ee.agent.systemagent.api.TaskExecutionContext)
+     */
     public TaskOutput execute(Map<String, String> taskArguments, TaskExecutionContext taskExecutionContext) throws TaskExecutionException {
         try {
             logger.info("Exceuting CouchBaseMonitor...");
@@ -73,6 +76,11 @@ public class CouchBaseMonitor extends AManagedMonitor{
         return new TaskOutput("Task failed with errors");
     }
 
+    /**
+     * Print helper function. Concerned only with printing the metric map
+     * @param 	metricPrefix	Prefix identifying the metric to be a cluster, node, or bucket metric
+     * @param 	metricsMap		Map containing metrics
+     */
     private void printMetricsHelper(String metricPrefix, Map metricsMap) throws Exception {
         HashMap<String, Number> metrics = (HashMap<String, Number>) metricsMap;
         Iterator iterator = metrics.keySet().iterator();
@@ -86,6 +94,12 @@ public class CouchBaseMonitor extends AManagedMonitor{
         }
     }
 
+    /**
+     * Prints metrics for a cluster, nodes, or buckets
+     * @param 	metricPrefix	Prefix identifying the metric to be a cluster, node, or bucket metric
+     * @param   id              Identifies the node or bucket id
+     * @param 	metricsMap		Map containing metrics
+     */
     private void printMetrics(String metricPrefix, String id, HashMap metricsMap) throws Exception {
         if (id.equals("")) {
             printMetricsHelper(metricPrefix, metricsMap);

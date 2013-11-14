@@ -31,7 +31,7 @@ public class CouchBaseWrapper {
     }
 
     /**
-     * Connects to the couchbase host and retrieves metrics using the CouchBase REST API
+     * Connects to the couchbase cluster host and retrieves metrics using the CouchBase REST API
      * @return 	HashMap     Map containing metrics retrieved from using the CouchBase REST API
      */
     public HashMap gatherMetrics() throws Exception{
@@ -115,6 +115,11 @@ public class CouchBaseWrapper {
         }
     }
 
+    /**
+     * Populates the cluster metrics hashmap
+     * @param   clusterStats     A JsonObject containing metrics for the entire cluster
+     * @param   clusterMetrics   An initially empty map that is populated based on values retrieved from traversing the clusterStats JsonObject
+     */
     private void populateClusterMetrics(JsonObject clusterStats, HashMap clusterMetrics) throws Exception{
         JsonObject ramStats = clusterStats.getAsJsonObject("ram");
         Iterator iterator = ramStats.entrySet().iterator();
@@ -125,6 +130,11 @@ public class CouchBaseWrapper {
         populateMetricsMapHelper(iterator, clusterMetrics, "hdd_");
     }
 
+    /**
+     * Populates the node metrics hashmap
+     * @param   nodes           A JsonArray containing metrics for all nodes
+     * @param   nodeMetrics     An initially empty map that is populated based on values retrieved from traversing the nodes JsonArray
+     */
     private void populateNodeMetrics(JsonArray nodes, HashMap<String, HashMap<String, Number>> nodeMetrics) {
         for (JsonElement node : nodes) {
             JsonObject nodeObject = node.getAsJsonObject();
@@ -144,6 +154,11 @@ public class CouchBaseWrapper {
         }
     }
 
+    /**
+     * Populates the bucket metrics hashmap
+     * @param   buckets        A JsonArray containing metrics for all buckets
+     * @param   bucketMetrics  An initially empty map that is populated based on values retrieved from traversing the buckets JsonArray
+     */
     private void populateBucketMetrics(JsonArray buckets, HashMap<String, HashMap<String, Number>> bucketMetrics) {
         for (JsonElement bucket : buckets) {
             JsonObject bucketObject = bucket.getAsJsonObject();
@@ -160,6 +175,12 @@ public class CouchBaseWrapper {
         }
     }
 
+    /**
+     * Populates an empty map with values retrieved from the entry set of a Json Object
+     * @param   iterator    An entry set iterator for the json object
+     * @param   metricsMap  Initially empty map that is populated based on the values retrieved from entry set
+     * @param   prefix      Optional prefix for the metric name to distinguish duplicate metric names
+     */
     private void populateMetricsMapHelper(Iterator iterator, HashMap metricsMap, String prefix) {
         while (iterator.hasNext()) {
             Map.Entry entry = (Map.Entry)iterator.next();
@@ -173,8 +194,8 @@ public class CouchBaseWrapper {
     }
 
     /**
-     * Construct the REST URL for the CoucheDB host
-     * @return	The CoucheDB host REST URL string
+     * Construct the REST URL for CoucheBase cluster/node statistics
+     * @return	The CoucheBase cluster/node statistics url string
      */
     private String constructClusterURL() {
         return new StringBuilder()
@@ -191,8 +212,8 @@ public class CouchBaseWrapper {
     }
 
     /**
-     * Construct the REST URL for the CoucheDB host
-     * @return	The CoucheDB host REST URL string
+     * Construct the REST URL for CoucheBase buckets associated with a node
+     * @return	The CoucheBase Bucket REST url string
      */
     private String constructBucketURL() {
         return new StringBuilder()
