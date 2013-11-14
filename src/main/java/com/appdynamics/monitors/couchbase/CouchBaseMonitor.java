@@ -5,37 +5,29 @@ import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
 import com.singularity.ee.agent.systemagent.api.TaskOutput;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
 public class CouchBaseMonitor extends AManagedMonitor{
 
     private static final String METRIC_PREFIX = "Custom Metrics|CouchBase|";
+    private static final Logger logger = Logger.getLogger(CouchBaseMonitor.class.getSimpleName());
 
     public static void main(String[] args) throws Exception{
-//        List<URI> baseList = new ArrayList<URI>();
-//        baseList.add(new URI("http://127.0.0.1:8091/pools"));
-//
-//        CouchbaseClient couchbaseClient = new CouchbaseClient(baseList, "default", "");
-//        Map stats = couchbaseClient.getStats();
-//        printMap(stats);
-//        couchbaseClient.shutdown();
+        Map<String, String> taskArguments = new HashMap<String, String>();
+        taskArguments.put("host", "localhost");
+        taskArguments.put("port", "8091");
+        taskArguments.put("username", "");
+        taskArguments.put("password", "");
 
-        CouchBaseConfig config = new CouchBaseConfig();
-        config.username="";
-        config.password="";
-        config.hostId="localhost";
-        config.port="8091";
-        CouchBaseWrapper wrapper = new CouchBaseWrapper(config);
-        try {
-            wrapper.gatherMetrics();
-
-        }
-        catch (Exception e) {
-            throw e;
-        }
-
+        CouchBaseMonitor monitor = new CouchBaseMonitor();
+        monitor.execute(taskArguments, null);
 	}
+    public CouchBaseMonitor() {
+        logger.setLevel(Level.INFO);
+    }
 
     /**
      * Writes the couchDB metrics to the controller
@@ -66,8 +58,19 @@ public class CouchBaseMonitor extends AManagedMonitor{
     }
 
     @Override
-    public TaskOutput execute(Map<String, String> stringStringMap, TaskExecutionContext taskExecutionContext) throws TaskExecutionException {
-
+    public TaskOutput execute(Map<String, String> taskArguments, TaskExecutionContext taskExecutionContext) throws TaskExecutionException {
+        try {
+            logger.info("Exceuting CouchBaseMonitor...");
+            CouchBaseWrapper couchBaseWrapper = new CouchBaseWrapper(taskArguments);
+            HashMap metrics = couchBaseWrapper.gatherMetrics();
+            logger.info("Gathered metrics successfully. Size of metrics: " + metrics.size());
+            printMetrics(metrics);
+            logger.info("Printed metrics successfully");
+            return new TaskOutput("Task successful...");
+        } catch (Exception e) {
+            logger.error("Exception: ", e);
+        }
+        return new TaskOutput("Task failed with errors");
     }
 
     private void printMetricsHelper(String metricPrefix, Map metricsMap) throws Exception {
@@ -97,18 +100,4 @@ public class CouchBaseMonitor extends AManagedMonitor{
             }
         }
     }
-
-//    private static void printMap(Map map) {
-//        Iterator iterator = map.keySet().iterator();
-//        while (iterator.hasNext()) {
-//            Object hostKey = iterator.next();
-//            Map metricMap = (Map) map.get(hostKey);
-//            Iterator metricIterator = metricMap.keySet().iterator();
-//            while (metricIterator.hasNext()) {
-//                String metricName = metricIterator.next().toString();
-//                String metricValue = (String) metricMap.get(metricName);
-//                System.out.println(String.format("Key: %40s Value: %25s", metricName, metricValue));
-//            }
-//        }
-//    }
 }

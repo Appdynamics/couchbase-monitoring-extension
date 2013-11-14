@@ -18,10 +18,16 @@ import java.util.Map;
 public class CouchBaseWrapper {
 
     private static final Logger logger = Logger.getLogger(CouchBaseWrapper.class.getSimpleName());
-    private CouchBaseConfig couchBaseConfig;
+    private String host;
+    private String port;
+    private String username;
+    private String password;
 
-    public CouchBaseWrapper(CouchBaseConfig couchBaseConfig) {
-        this.couchBaseConfig = couchBaseConfig;
+    public CouchBaseWrapper(Map<String, String> taskArguments) {
+        this.host = taskArguments.get("host");
+        this.port = taskArguments.get("port");
+        this.username = taskArguments.get("username");
+        this.password = taskArguments.get("password");
     }
 
     /**
@@ -39,7 +45,7 @@ public class CouchBaseWrapper {
             URL u = new URL(statsUrl);
             connection = (HttpURLConnection) u.openConnection();
             connection.setRequestMethod("GET");
-            logger.info("Connecting to database for host: " + couchBaseConfig.hostId + ":" + couchBaseConfig.port);
+            logger.info("Connecting to database for host: " + host + ":" + port);
             connection.connect();
             is = connection.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
@@ -173,13 +179,13 @@ public class CouchBaseWrapper {
     private String constructClusterURL() {
         return new StringBuilder()
                 .append("http://")
-                .append(couchBaseConfig.username)
+                .append(username)
                 .append(":")
-                .append(couchBaseConfig.password)
+                .append(password)
                 .append("@")
-                .append(couchBaseConfig.hostId)
+                .append(host)
                 .append(":")
-                .append(couchBaseConfig.port)
+                .append(port)
                 .append("/pools/stats")
                 .toString();
     }
@@ -191,13 +197,13 @@ public class CouchBaseWrapper {
     private String constructBucketURL() {
         return new StringBuilder()
                 .append("http://")
-                .append(couchBaseConfig.username)
+                .append(username)
                 .append(":")
-                .append(couchBaseConfig.password)
+                .append(password)
                 .append("@")
-                .append(couchBaseConfig.hostId)
+                .append(host)
                 .append(":")
-                .append(couchBaseConfig.port)
+                .append(port)
                 .append("/pools/buckets/buckets")
                 .toString();
     }
