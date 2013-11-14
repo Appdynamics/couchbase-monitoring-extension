@@ -44,18 +44,18 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 
 ### Metric Category: Cluster Metrics
 
-|Metric Name            |
-|-----------------------|
-|ram_total        	|
-|ram_quotaUsed        	|
-|ram_usedByData         |
-|ram_quotaTotal         |
-|ram_used	        |
-|hdd_total       	|
-|hdd_used       	|
-|hdd_usedByData       	|
-|hdd_quotaTotal       	|
-|hdd_free       	|
+|Metric Name            	|
+|------------------------------	|
+|ram_total        		|
+|ram_quotaUsed        		|
+|ram_usedByData         	|
+|ram_quotaTotal         	|
+|ram_used	        	|
+|hdd_total       		|
+|hdd_used       		|
+|hdd_usedByData       		|
+|hdd_quotaTotal       		|
+|hdd_free       		|
 
 ### Metric Category: Node Metrics
 
@@ -84,6 +84,20 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 |couch_docs_actual_disk_size    |
 |swap_total       		|
 |ops       			|
+
+### Metric Category: Bucket Metrics
+
+|Metric Name            	|
+|------------------------------	|
+|opsPerSec        		|
+|rawRAM  			|
+|diskFetches         		|
+|ram         			|
+|dataUsed	        	|
+|memUsed       			|
+|itemCount       		|
+|diskUsed       		|
+|quotaPercentUsed       	|
 
 
 ## Custom Dashboard
