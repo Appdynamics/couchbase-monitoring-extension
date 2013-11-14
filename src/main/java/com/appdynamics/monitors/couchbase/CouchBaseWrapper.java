@@ -58,8 +58,8 @@ public class CouchBaseWrapper {
             HashMap nodeMetrics = new HashMap();
             populateNodeMetrics(nodes, nodeMetrics);
 
-            couchbaseMetrics.put("Cluster Stats", clusterMetrics);
-            couchbaseMetrics.put("Node Stats", nodeMetrics);
+            couchbaseMetrics.put("ClusterStats", clusterMetrics);
+            couchbaseMetrics.put("NodeStats", nodeMetrics);
 
             // Clean up before starting new connection
             is.close();
@@ -86,7 +86,7 @@ public class CouchBaseWrapper {
             JsonArray bucketStats = new JsonParser().parse(jsonString.toString()).getAsJsonArray();
             HashMap bucketMetrics = new HashMap();
             populateBucketMetrics(bucketStats, bucketMetrics);
-            couchbaseMetrics.put("Bucket Stats", bucketMetrics);
+            couchbaseMetrics.put("BucketStats", bucketMetrics);
 
             return couchbaseMetrics;
         } catch(MalformedURLException e) {
