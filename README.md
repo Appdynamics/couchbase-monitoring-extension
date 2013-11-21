@@ -5,7 +5,7 @@ This eXtension works only with the Java agent.
 
 ## Use Case
 
-Couchbase Server is an open source, distributed (shared-nothing architecture) NoSQL document-oriented database that is optimized for interactive applications. This extension allows the user to connect to specific cluster host and retrieve metrics about the cluster, all the nodes within the cluster and any buckts associated with the nodes.  
+Couchbase Server is an open source, distributed (shared-nothing architecture) NoSQL document-oriented database that is optimized for interactive applications. This extension allows the user to connect to a specific cluster host and retrieve metrics about the cluster, all the nodes within the cluster and any buckets associated with the nodes.  
 
 ## Installation
 <ol>
@@ -15,7 +15,7 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 	</li>
 	<li>Unzip the deployed file.
 	</li>
-	<li>Open &lt;machineagent install dir&gt;/monitors/CouchBaseMonitor/conf/monitor.xml and configure the CouchBase parameters.
+	<li>Open &lt;machineagent install dir&gt;/monitors/CouchBaseMonitor/monitor.xml and configure the CouchBase parameters.
 <p></p>
 <pre>
 	 &lt;argument name="host" is-required="false" default-value="localhost"/&gt;
