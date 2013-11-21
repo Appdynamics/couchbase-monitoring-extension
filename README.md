@@ -102,7 +102,7 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 
 ## Custom Dashboard
 
-![](https://raw.github.com/Appdynamics/couchedb-monitoring-extension/master/couchedb%20Dashboard.png?token=2880440__eyJzY29wZSI6IlJhd0Jsb2I6QXBwZHluYW1pY3MvZWhjYWNoZS1tb25pdG9yaW5nLWV4dGVuc2lvbi9tYXN0ZXIvRWhjYWNoZSBEYXNoYm9hcmQucG5nIiwiZXhwaXJlcyI6MTM4NDM2NzI4Mn0%3D--a6f98fa60151f8b5c0823c39fb52770d147e55bf)
+![](https://raw.github.com/Appdynamics/couchbase-monitoring-extension/master/CouchBase%20Dashboard.png?token=2880440__eyJzY29wZSI6IlJhd0Jsb2I6QXBwZHluYW1pY3MvY291Y2hiYXNlLW1vbml0b3JpbmctZXh0ZW5zaW9uL21hc3Rlci9Db3VjaEJhc2UgRGFzaGJvYXJkLnBuZyIsImV4cGlyZXMiOjEzODU1OTc2NTB9--6bbd2905a54e9debae5404fc6ba249c7a752b13b)
 
 ##Contributing
 
