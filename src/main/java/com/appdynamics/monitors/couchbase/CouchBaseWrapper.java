@@ -45,6 +45,7 @@ public class CouchBaseWrapper {
             URL u = new URL(statsUrl);
             connection = (HttpURLConnection) u.openConnection();
             connection.setRequestMethod("GET");
+
             logger.info("Connecting to database for host: " + host + ":" + port);
             connection.connect();
             is = connection.getInputStream();
@@ -96,7 +97,7 @@ public class CouchBaseWrapper {
 
             return couchbaseMetrics;
         } catch(MalformedURLException e) {
-            logger.error("Invalid URL used to connect to CouchDB: " + statsUrl);
+            logger.error("Invalid URL used to connect to CouchBase: " + statsUrl);
             throw e;
         } catch(JsonSyntaxException e) {
             logger.error("Error parsing the Json response");

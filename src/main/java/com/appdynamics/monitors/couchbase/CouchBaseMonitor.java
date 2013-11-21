@@ -37,6 +37,12 @@ public class CouchBaseMonitor extends AManagedMonitor{
         printMetrics("Cluster Stats|", "", (HashMap)metricsMap.get("ClusterStats"));
         printMetrics("Node Stats|", "NodeID|", (HashMap)metricsMap.get("NodeStats"));
         printMetrics("Bucket Stats|", "BucketID|", (HashMap)metricsMap.get("BucketStats"));
+
+        // Another structure
+
+        //printMetrics("Cluster Stats|", "", (HashMap)metricsMap.get("ClusterStats"));
+        //printMetrics("Cluster Stats|Node Stats|", "NodeID|", (HashMap)metricsMap.get("NodeStats"));
+        //printMetrics("ClusterStats|Node Stats|Bucket Stats|", "BucketID|", (HashMap)metricsMap.get("BucketStats"));
     }
 
     /**
