@@ -7,13 +7,23 @@ import com.singularity.ee.agent.systemagent.api.TaskOutput;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.*;
 
-public class CouchBaseMonitor extends AManagedMonitor{
+public class CouchBaseMonitor extends AManagedMonitor {
 
     private static final String METRIC_PREFIX = "Custom Metrics|CouchBase|";
     private static final Logger logger = Logger.getLogger(CouchBaseMonitor.class.getSimpleName());
+    private HashSet<String> disabledMetrics = new HashSet<String>();
+    private boolean isInitialized = false;
 
     public static void main(String[] args) throws Exception{
         Map<String, String> taskArguments = new HashMap<String, String>();
@@ -21,16 +31,26 @@ public class CouchBaseMonitor extends AManagedMonitor{
         taskArguments.put("port", "8091");
         taskArguments.put("username", "");
         taskArguments.put("password", "");
+        taskArguments.put("disabled-metrics-path", "conf/DisabledMetrics.xml");
 
         CouchBaseMonitor monitor = new CouchBaseMonitor();
         monitor.execute(taskArguments, null);
 	}
+
     public CouchBaseMonitor() {
         logger.setLevel(Level.INFO);
     }
 
+    private void initialize(Map<String, String> taskArguments) throws Exception{
+        if (!isInitialized) {
+            populateDisabledMetrics(taskArguments.get("disabled-metrics-path"));
+            isInitialized = true;
+            logger.info("Got list of disabled metrics from config file: " + taskArguments.get("disabled-metrics-path"));
+        }
+    }
+
     /**
-     * Writes the couchDB metrics to the controller
+     * Writes the couchBase metrics to the controller
      * @param 	metricsMap		HashMap containing all the couchDB metrics
      */
     private void printMetrics(HashMap metricsMap) throws Exception {
@@ -38,11 +58,11 @@ public class CouchBaseMonitor extends AManagedMonitor{
         printMetrics("Node Stats|", "NodeID|", (HashMap)metricsMap.get("NodeStats"));
         printMetrics("Bucket Stats|", "BucketID|", (HashMap)metricsMap.get("BucketStats"));
 
-        // Another structure
+        // Another possible structure in the Metric Browser
 
         //printMetrics("Cluster Stats|", "", (HashMap)metricsMap.get("ClusterStats"));
         //printMetrics("Cluster Stats|Node Stats|", "NodeID|", (HashMap)metricsMap.get("NodeStats"));
-        //printMetrics("ClusterStats|Node Stats|Bucket Stats|", "BucketID|", (HashMap)metricsMap.get("BucketStats"));
+        //printMetrics("Cluster Stats|Node Stats|Bucket Stats|", "BucketID|", (HashMap)metricsMap.get("BucketStats"));
     }
 
     /**
@@ -69,6 +89,7 @@ public class CouchBaseMonitor extends AManagedMonitor{
      */
     public TaskOutput execute(Map<String, String> taskArguments, TaskExecutionContext taskExecutionContext) throws TaskExecutionException {
         try {
+            initialize(taskArguments);
             logger.info("Exceuting CouchBaseMonitor...");
             CouchBaseWrapper couchBaseWrapper = new CouchBaseWrapper(taskArguments);
             HashMap metrics = couchBaseWrapper.gatherMetrics();
@@ -93,10 +114,12 @@ public class CouchBaseMonitor extends AManagedMonitor{
         while (iterator.hasNext()) {
             String metricName = iterator.next().toString();
             Number metric = metrics.get(metricName);
-            printMetric(metricPrefix + metricName, metric,
-                    MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
-                    MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
-                    MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
+            if (!disabledMetrics.contains(metricName)) {
+                printMetric(metricPrefix + metricName, metric,
+                        MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
+                        MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
+                        MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
+            }
         }
     }
 
@@ -120,4 +143,42 @@ public class CouchBaseMonitor extends AManagedMonitor{
             }
         }
     }
+
+    /**
+     * Reads the config file in the conf/ directory and retrieves the list of disabled metrics
+     * @param filePath          Path to the configuration file
+     */
+    private void populateDisabledMetrics(String filePath) throws Exception{
+        BufferedInputStream configFile = null;
+
+        try {
+            configFile = new BufferedInputStream(new FileInputStream(filePath));
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(configFile);
+
+            Element disabledMetricsElement = (Element)doc.getElementsByTagName("DisabledMetrics").item(0);
+            NodeList disabledMetricList = disabledMetricsElement.getElementsByTagName("Metric");
+
+            for (int i=0; i < disabledMetricList.getLength(); i++) {
+                Node disabledMetric = disabledMetricList.item(i);
+                disabledMetrics.add(disabledMetric.getAttributes().getNamedItem("name").getTextContent());
+            }
+        } catch (FileNotFoundException e) {
+            logger.error("Config file not found");
+            throw e;
+        } catch (ParserConfigurationException e) {
+            logger.error("Failed to instantiate new DocumentBuilder");
+            throw e;
+        } catch (SAXException e) {
+            logger.error("Error parsing the config file");
+            throw e;
+        } catch (DOMException e) {
+            logger.error("Could not parse metric name");
+            throw e;
+        } finally {
+            configFile.close();
+        }
+    }
+
 }

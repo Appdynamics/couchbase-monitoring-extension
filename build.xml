@@ -7,7 +7,6 @@
     <path id="myClassPath">
         <fileset dir="${lib.dir}" includes="**/*.jar"/>
         <fileset dir="${conf.dir}" includes="*.*"/>
-
     </path>
 
     <target name="build">
@@ -15,6 +14,7 @@
         <javac destdir="${build.dir}/classes" source="1.5" target="1.5" srcdir="src/" classpathref="myClassPath" debug="on"/>
         <mkdir dir="${build.dir}/CouchBaseMonitor"/>
         <mkdir dir="${build.dir}/CouchBaseMonitor/lib"/>
+        <mkdir dir="${build.dir}/CouchBaseMonitor/${conf.dir}"/>
 
         <jar destfile="${build.dir}/CouchBaseMonitor/${project.name}.jar">
             <fileset dir="${build.dir}/classes"/>
@@ -27,6 +27,9 @@
         </copy>
         <copy todir="${build.dir}/CouchBaseMonitor/">
             <fileset dir="${conf.dir}" includes="monitor.xml"/>
+        </copy>
+        <copy todir="${build.dir}/CouchBaseMonitor/${conf.dir}">
+            <fileset dir="${conf.dir}" excludes="monitor.xml"/>
         </copy>
         <delete dir="${build.dir}/classes"/>
     </target>
