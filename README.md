@@ -22,7 +22,7 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
          &lt;argument name="port" is-required="false" default-value="8091"/&gt;
          &lt;argument name="username" is-required="false" default-value="username"/&gt;
          &lt;argument name="password" is-required="false" default-value="password"/&gt;
-         &lt;argument name="disabled-metrics-path" is-required="false" default-value="conf/DisabledMetrics.xml"/&gt;
+         &lt;argument name="disabled-metrics-path" is-required="false" default-value="monitors/CouchBaseMonitor/conf/DisabledMetrics.xml"/&gt;
 </pre>
 	</li>
 	<li>Open &lt;machineagent install dir&gt;/monitors/CouchBaseMonitor/conf/DisabledMetrics.xml and configure the list of disabled metrics. Here is a sample configuration of the disabled metrics:
