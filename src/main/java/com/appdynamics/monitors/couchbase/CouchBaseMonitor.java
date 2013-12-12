@@ -41,6 +41,11 @@ public class CouchBaseMonitor extends AManagedMonitor {
         logger.setLevel(Level.INFO);
     }
 
+    /**
+     * Initializes the list of disabled metrics by reading the configuration file specified in monitor.xml
+     * @param taskArguments
+     * @throws Exception
+     */
     private void initialize(Map<String, String> taskArguments) throws Exception{
         if (!isInitialized) {
             populateDisabledMetrics(taskArguments.get("disabled-metrics-path"));

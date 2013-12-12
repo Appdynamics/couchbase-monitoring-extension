@@ -30,8 +30,6 @@ public class CouchBaseWrapper {
         this.password = taskArguments.get("password");
     }
 
-
-
     /**
      * Connects to the couchbase cluster host and retrieves metrics using the CouchBase REST API
      * @return 	HashMap     Map containing metrics retrieved from using the CouchBase REST API
