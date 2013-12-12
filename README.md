@@ -21,7 +21,8 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 	 &lt;argument name="host" is-required="false" default-value="localhost"/&gt;
          &lt;argument name="port" is-required="false" default-value="8091"/&gt;
          &lt;argument name="username" is-required="false" default-value="username"/&gt;
-         &lt;argument name="password" is-required="false" default-value="password"/&gt;	
+         &lt;argument name="password" is-required="false" default-value="password"/&gt;
+         &lt;argument name="disabled-metrics-path" is-required="false" default-value="conf/DisabledMetrics.xml"/&gt;
 </pre>
 	</li>	
 	<li> Restart the machine agent.
@@ -34,7 +35,7 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 
 | Directory/File | Description |
 |----------------|-------------|
-|conf            | Contains the monitor.xml |
+|conf            | Contains the monitor.xml, DisabledMetrics.xml |
 |lib             | Contains third-party project references |
 |src             | Contains source code of the CouchBase monitoring extension |
 |dist            | Only obtained when using ant. Run 'ant build' to get binaries. Run 'ant package' to get the distributable .zip file |
