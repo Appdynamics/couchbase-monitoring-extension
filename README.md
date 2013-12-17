@@ -52,18 +52,18 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 
 ### Metric Category: Cluster Metrics
 
-|Metric Name            	|
-|------------------------------	|
-|ram_total        		|
-|ram_quotaUsed        		|
-|ram_usedByData         	|
-|ram_quotaTotal         	|
-|ram_used	        	|
-|hdd_total       		|
-|hdd_used       		|
-|hdd_usedByData       		|
-|hdd_quotaTotal       		|
-|hdd_free       		|
+|Metric Name            	|Description|
+|------------------------------	|------------|
+|ram_total        		|Total ram available to cluster (bytes)
+|ram_quotaUsed        		|Ram quota used by the cluster (bytes)
+|ram_usedByData         	|Ram used by the data in the cluster (bytes)
+|ram_quotaTotal         	|Ram quota total for the cluster (bytes)
+|ram_used	        	|Ram used by the cluster (bytes)
+|hdd_total       		|Total harddrive space available to cluster (bytes)
+|hdd_used       		|Harddrive space used by the cluster (bytes)
+|hdd_usedByData       		|Harddrive use by the data in the cluster(bytes)
+|hdd_quotaTotal       		|Harddrive quota total for the cluster (bytes)
+|hdd_free       		|Free harddrive space in the cluster (bytes)
 
 ### Metric Category: Node Metrics
 
