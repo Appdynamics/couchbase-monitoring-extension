@@ -73,8 +73,8 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 |vb_replica_curr_items  	|Number of items/documents that are replicas 
 |couch_docs_data_size         	|Data size of couch documents associated with a node (bytes)
 |mem_total	        	|Total memory available to the node (bytes)
-|mcdMemoryAllocated       	|N/A
-|mcdMemoryReserved       	|N/A
+|mcdMemoryAllocated       	|Amount of memcached memory allocated (bytes)
+|mcdMemoryReserved       	|Amount of memcached memory reserved (bytes)
 |uptime       			|Time during which the node was in operation (sec)
 |ep_bg_fetched       		|Number of disk fetches performed since server was started
 |mem_used       		|Memory used by the node (bytes)
@@ -82,14 +82,14 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 |get_hits  			|Number of get hits
 |curr_items         		|Number of current items
 |cmd_get	        	|Number of get commands
-|couch_views_actual_disk_size   |N/A
-|swap_used       		|N/A
+|couch_views_actual_disk_size   |Amount of disk space occupied by Couch views (bytes)
+|swap_used       		|Amount of swap space used.(bytes)
 |cpu_utilization_rate       	|The CPU utilization rate (%)
-|couch_views_data_size       	|N/A
+|couch_views_data_size       	|Size of object data for Couch views (bytes)
 |curr_items_tot       		|Total number of items associated with node
-|couch_docs_actual_disk_size    |N/A
-|swap_total       		|N/A
-|ops       			|N/A
+|couch_docs_actual_disk_size    |Amount of disk space used by Couch docs.(bytes)
+|swap_total       		|Total swap size allocated (bytes)
+|ops       			|Number of operations performed on Couchbase
 
 ### Metric Category: Bucket Metrics
 
@@ -99,11 +99,11 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 |rawRAM  			|Amount of raw RAM used by the bucket (bytes)
 |diskFetches         		|Number of disk fetches
 |ram         			|Amount of RAM used by the bucket (bytes)
-|dataUsed	        	|N/A
+|dataUsed	        	|Size of user data within buckets of the specified state that are resident in RAM.(%)
 |memUsed       			|Amount of memory used by the bucket (bytes)
 |itemCount       		|Number of items associated with the bucket
 |diskUsed       		|Amount of disk used (bytes)
-|quotaPercentUsed       	|N/A
+|quotaPercentUsed       	|Percentage of RAM used (for active objects) against the configure bucket size.(%)
 
 
 ## Custom Dashboard
