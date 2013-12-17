@@ -67,35 +67,33 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 
 ### Metric Category: Node Metrics
 
-|Metric Name            	|
-|------------------------------	|
-|memoryFree        		|
-|vb_replica_curr_items  	|
-|clusterCompatibility         	|
-|couch_docs_data_size         	|
-|mem_total	        	|
-|mcdMemoryAllocated       	|
-|mcdMemoryReserved       	|
-|uptime       			|
-|ep_bg_fetched       		|
-|mem_used       		|
-|memoryTotal        		|
-|get_hits  			|
-|curr_items         		|
-|mem_free         		|
-|cmd_get	        	|
-|couch_views_actual_disk_size   |
-|swap_used       		|
-|cpu_utilization_rate       	|
-|couch_views_data_size       	|
-|curr_items_tot       		|
-|couch_docs_actual_disk_size    |
-|swap_total       		|
-|ops       			|
+|Metric Name            	|Description|
+|------------------------------	|-----------|
+|memoryFree        		|Amount of memory free for the node (bytes)
+|vb_replica_curr_items  	|Number of items/documents that are replicas 
+|couch_docs_data_size         	|Data size of couch documents associated with a node (bytes)
+|mem_total	        	|Total memory available to the node (bytes)
+|mcdMemoryAllocated       	|N/A
+|mcdMemoryReserved       	|N/A
+|uptime       			|Time during which the node was in operation (sec)
+|ep_bg_fetched       		|Number of disk fetches performed since server was started
+|mem_used       		|Memory used by the node (bytes)
+|memoryTotal        		|Total memory available to the node (bytes)
+|get_hits  			|Number of get hits
+|curr_items         		|Number of current items
+|cmd_get	        	|Number of get commands
+|couch_views_actual_disk_size   |N/A
+|swap_used       		|N/A
+|cpu_utilization_rate       	|The CPU utilization rate (%)
+|couch_views_data_size       	|N/A
+|curr_items_tot       		|Total number of items associated with node
+|couch_docs_actual_disk_size    |N/A
+|swap_total       		|N/A
+|ops       			|N/A
 
 ### Metric Category: Bucket Metrics
 
-|Metric Name            	|
+|Metric Name            	|Descri
 |------------------------------	|
 |opsPerSec        		|
 |rawRAM  			|
