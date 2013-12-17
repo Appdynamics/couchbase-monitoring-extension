@@ -93,17 +93,17 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 
 ### Metric Category: Bucket Metrics
 
-|Metric Name            	|Descri
-|------------------------------	|
-|opsPerSec        		|
-|rawRAM  			|
-|diskFetches         		|
-|ram         			|
-|dataUsed	        	|
-|memUsed       			|
-|itemCount       		|
-|diskUsed       		|
-|quotaPercentUsed       	|
+|Metric Name            	|Description|
+|------------------------------	|-----------|
+|opsPerSec        		|Number of operations per second
+|rawRAM  			|Amount of raw RAM used by the bucket (bytes)
+|diskFetches         		|Number of disk fetches
+|ram         			|Amount of RAM used by the bucket (bytes)
+|dataUsed	        	|N/A
+|memUsed       			|Amount of memory used by the bucket (bytes)
+|itemCount       		|Number of items associated with the bucket
+|diskUsed       		|Amount of disk used (bytes)
+|quotaPercentUsed       	|N/A
 
 
 ## Custom Dashboard
