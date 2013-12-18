@@ -112,11 +112,11 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 
 ##Contributing
 
-Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/couchbase-monitoring-extension).
+Always feel free to fork and contribute any changes directly here on GitHub.
 
 ##Community
 
-Find out more in the [AppSphere](http://appsphere.appdynamics.com) community.
+Find out more in the [AppSphere](http://appsphere.appdynamics.com/t5/eXchange/CouchBase---Monitoring-Extension/idi-p/5567) community.
 
 ##Support
 
