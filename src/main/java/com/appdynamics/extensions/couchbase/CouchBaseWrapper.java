@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package com.appdynamics.monitors.couchbase;
+package com.appdynamics.extensions.couchbase;
 
 import com.google.gson.*;
 import org.apache.commons.lang.math.NumberUtils;
