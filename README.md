@@ -9,23 +9,24 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 
 ## Installation
 <ol>
-	<li>Type 'ant package' in the command line from the couchbase-monitoring-extension directory.
+	<li>Run 'mvn clean install' in the command line from the couchbase-monitoring-extension directory.
 	</li>
-	<li>Deploy the file CouchBaseMonitor.zip found in the 'dist' directory into the &lt;machineagent install dir&gt;/monitors/ directory.
+	<li>Deploy the file CouchBaseMonitor.zip found in the 'target' directory into `<MACHINE_AGENT_HOME>/monitors/` directory.
 	</li>
 	<li>Unzip the deployed file.
 	</li>
-	<li>Open &lt;machineagent install dir&gt;/monitors/CouchBaseMonitor/monitor.xml and configure the CouchBase parameters.
+	<li>Open `<MACHINE_AGENT_HOME>/monitors/CouchBaseMonitor/monitor.xml` and configure the CouchBase parameters.
 <p></p>
 <pre>
-	 &lt;argument name="host" is-required="false" default-value="localhost"/&gt;
-         &lt;argument name="port" is-required="false" default-value="8091"/&gt;
-         &lt;argument name="username" is-required="false" default-value="username"/&gt;
-         &lt;argument name="password" is-required="false" default-value="password"/&gt;
+	     &lt;argument name="host" is-required="true" default-value="localhost"/&gt;
+         &lt;argument name="port" is-required="true" default-value="8091"/&gt;
+         &lt;argument name="username" is-required="true" default-value="username"/&gt;
+         &lt;argument name="password" is-required="true" default-value="password"/&gt;
          &lt;argument name="disabled-metrics-path" is-required="false" default-value="monitors/CouchBaseMonitor/conf/DisabledMetrics.xml"/&gt;
+		 &lt;argument name="metric-prefix" is-required="false" default-value="Custom Metrics|Couchbase|"/&gt;
 </pre>
 	</li>
-	<li>Open &lt;machineagent install dir&gt;/monitors/CouchBaseMonitor/conf/DisabledMetrics.xml and configure the list of disabled metrics. Here is a sample configuration of the disabled metrics:
+	<li>Open `<MACHINE_AGENT_HOME>/monitors/CouchBaseMonitor/conf/DisabledMetrics.xml` and configure the list of disabled metrics. Here is a sample configuration of the disabled metrics:
 <p></p>
 <pre>
 	 &lt;Metric name="mem_free"/&gt;
@@ -42,11 +43,10 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 
 | Directory/File | Description |
 |----------------|-------------|
-|conf            | Contains the monitor.xml, DisabledMetrics.xml |
-|lib             | Contains third-party project references |
-|src             | Contains source code of the CouchBase monitoring extension |
-|dist            | Only obtained when using ant. Run 'ant build' to get binaries. Run 'ant package' to get the distributable .zip file |
-|build.xml       | Ant build script to package the project (required only if changing Java code) |
+|src/main/resources/conf            | Contains the monitor.xml, DisabledMetrics.xml |
+|src/main/java             | Contains source code of the CouchBase monitoring extension |
+|target            | Only obtained when using maven. Run 'mvn clean install' to get the distributable .zip file |
+|pom.xml       | Maven build script to package the project (required only if changing Java code) |
 
 ## Metrics
 

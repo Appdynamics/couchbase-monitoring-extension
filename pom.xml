@@ -6,16 +6,13 @@
   <artifactId>couchbase-monitoring-extension</artifactId>
   <version>1.1.0</version>
   <packaging>jar</packaging>
-
   <name>couchbase-monitoring-extension</name>
   <url>http://maven.apache.org</url>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<target.dir>${project.build.directory}/CouchBaseMonitor</target.dir>
   </properties>
-
   <dependencies>
   	<dependency>
 			<groupId>com.appdynamics</groupId>
@@ -28,6 +25,11 @@
 			<artifactId>appd-exts-commons</artifactId>
 			<version>1.0.7</version>
 		</dependency>
+		<dependency>
+   		<groupId>commons-httpclient</groupId>
+   		<artifactId>commons-httpclient</artifactId>
+   		<version>3.1</version>
+    </dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
@@ -51,7 +53,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
   <build>
 		<finalName>${project.artifactId}</finalName>
 		<resources>

@@ -16,18 +16,21 @@
 package com.appdynamics.extensions.couchbase;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -35,6 +38,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.appdynamics.TaskInputArgs;
+import com.appdynamics.extensions.ArgumentsValidator;
+import com.appdynamics.extensions.PathResolver;
+import com.appdynamics.extensions.http.SimpleHttpClient;
+import com.google.common.base.Strings;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
 import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
@@ -43,15 +51,78 @@ import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException
 
 public class CouchBaseMonitor extends AManagedMonitor {
 
-	private static final String METRIC_PREFIX = "Custom Metrics|CouchBase|";
-	private static final Logger logger = Logger.getLogger("com.singularity.extensions.CouchBaseMonitor");
-	private HashSet<String> disabledMetrics = new HashSet<String>();
+	private static final String BUCKET_STATS_PREFIX = "Bucket Stats|";
+	private static final String NODE_STATS_PREFIX = "Node Stats|";
+	private static final String CLUSTER_STATS_PREFIX = "Cluster Stats|";
+	private static final String METRIC_SEPARATOR = "|";
+	private static final String DISABLED_METRICS_PATH = "disabled-metrics-path";
+	private static final String DISABLED_METRICS_XML = "monitors/CouchBaseMonitor/DisabledMetrics.xml";
+	private static String METRIC_PREFIX_VALUE = "Custom Metrics|Couchbase|";
+	private static final Logger logger = LoggerFactory.getLogger("com.singularity.extensions.CouchBaseMonitor");
+	private Set<String> disabledMetrics = new HashSet<String>();
 	private boolean isInitialized = false;
 
 	public CouchBaseMonitor() {
 		String msg = "Using Monitor Version [" + getImplementationVersion() + "]";
 		logger.info(msg);
 		System.out.println(msg);
+	}
+
+	public static final Map<String, String> DEFAULT_ARGS = new HashMap<String, String>() {
+		{
+			put(TaskInputArgs.METRIC_PREFIX, METRIC_PREFIX_VALUE);
+			put(DISABLED_METRICS_PATH, DISABLED_METRICS_XML);
+		}
+	};
+
+	/**
+	 * Main execution method that uploads the metrics to the AppDynamics
+	 * Controller
+	 * 
+	 * @see com.singularity.ee.agent.systemagent.api.ITask#execute(java.util.Map,
+	 *      com.singularity.ee.agent.systemagent.api.TaskExecutionContext)
+	 */
+	public TaskOutput execute(Map<String, String> taskArguments, TaskExecutionContext taskExecutionContext) throws TaskExecutionException {
+		try {
+			logger.info("Exceuting CouchBaseMonitor...");
+			taskArguments = ArgumentsValidator.validateArguments(taskArguments, DEFAULT_ARGS);
+			initialize(taskArguments);
+			logger.debug("The task arguments are {} ", taskArguments);
+
+			SimpleHttpClient httpClient = SimpleHttpClient.builder(taskArguments).build();
+
+			CouchBaseWrapper couchBaseWrapper = new CouchBaseWrapper();
+			Map<String, Map<String, Double>> clusterNodeMetrics = couchBaseWrapper.gatherClusterNodeMetrics(httpClient);
+			printClusterNodeMetrics(clusterNodeMetrics);
+			Map<String, Map<String, Double>> bucketMetrics = couchBaseWrapper.gatherBucketMetrics(httpClient);
+			printBucketMetrics(bucketMetrics);
+
+			logger.info("Printed metrics successfully");
+			return new TaskOutput("Task successfull...");
+		} catch (Exception e) {
+			logger.error("Exception: ", e);
+		}
+		return new TaskOutput("Task failed with errors");
+	}
+
+	private void printClusterNodeMetrics(Map<String, Map<String, Double>> nodeMetrics) throws Exception {
+		for (Entry<String, Map<String, Double>> entry : nodeMetrics.entrySet()) {
+			String key = entry.getKey();
+			Map<String, Double> metrics = entry.getValue();
+			if (CouchBaseWrapper.CLUSTER_STATS_KEY.equals(key)) {
+				printMetricsHelper(CLUSTER_STATS_PREFIX, metrics);
+			} else {
+				printMetricsHelper(NODE_STATS_PREFIX + key + METRIC_SEPARATOR, metrics);
+			}
+		}
+	}
+
+	private void printBucketMetrics(Map<String, Map<String, Double>> nodeMetrics) throws Exception {
+		for (Entry<String, Map<String, Double>> entry : nodeMetrics.entrySet()) {
+			String bucketName = entry.getKey();
+			Map<String, Double> metrics = entry.getValue();
+			printMetricsHelper(BUCKET_STATS_PREFIX + bucketName + METRIC_SEPARATOR, metrics);
+		}
 	}
 
 	/**
@@ -63,31 +134,12 @@ public class CouchBaseMonitor extends AManagedMonitor {
 	 */
 	private void initialize(Map<String, String> taskArguments) throws Exception {
 		if (!isInitialized) {
-			populateDisabledMetrics(taskArguments.get("disabled-metrics-path"));
+			String fileName = getConfigFilename(taskArguments.get(DISABLED_METRICS_PATH));
+			populateDisabledMetrics(fileName);
 			isInitialized = true;
-			logger.info("Got list of disabled metrics from config file: " + taskArguments.get("disabled-metrics-path"));
+			logger.info("Got list of disabled metrics from config file: " + taskArguments.get(DISABLED_METRICS_PATH));
 		}
-	}
-
-	/**
-	 * Writes the couchBase metrics to the controller
-	 * 
-	 * @param metricsMap
-	 *            HashMap containing all the couchDB metrics
-	 */
-	private void printMetrics(HashMap metricsMap) throws Exception {
-		printMetrics("Cluster Stats|", "", (HashMap) metricsMap.get("ClusterStats"));
-		printMetrics("Node Stats|", "NodeID|", (HashMap) metricsMap.get("NodeStats"));
-		printMetrics("Bucket Stats|", "BucketID|", (HashMap) metricsMap.get("BucketStats"));
-
-		// Another possible structure in the Metric Browser
-
-		// printMetrics("Cluster Stats|", "",
-		// (HashMap)metricsMap.get("ClusterStats"));
-		// printMetrics("Cluster Stats|Node Stats|", "NodeID|",
-		// (HashMap)metricsMap.get("NodeStats"));
-		// printMetrics("Cluster Stats|Node Stats|Bucket Stats|", "BucketID|",
-		// (HashMap)metricsMap.get("BucketStats"));
+		METRIC_PREFIX_VALUE = taskArguments.get(TaskInputArgs.METRIC_PREFIX) + METRIC_SEPARATOR;
 	}
 
 	/**
@@ -104,33 +156,11 @@ public class CouchBaseMonitor extends AManagedMonitor {
 	 * @param cluster
 	 *            Collective OR Individual
 	 */
-	private void printMetric(String metricName, Number metricValue, String aggregation, String timeRollup, String cluster) throws Exception {
-		MetricWriter metricWriter = super.getMetricWriter(METRIC_PREFIX + metricName, aggregation, timeRollup, cluster);
-		metricWriter.printMetric(String.valueOf((long) metricValue.doubleValue()));
-	}
-
-	/**
-	 * Main execution method that uploads the metrics to the AppDynamics
-	 * Controller
-	 * 
-	 * @see com.singularity.ee.agent.systemagent.api.ITask#execute(java.util.Map,
-	 *      com.singularity.ee.agent.systemagent.api.TaskExecutionContext)
-	 */
-	public TaskOutput execute(Map<String, String> taskArguments, TaskExecutionContext taskExecutionContext) throws TaskExecutionException {
-		try {
-			initialize(taskArguments);
-			logger.info("Exceuting CouchBaseMonitor...");
-			CouchBaseWrapper couchBaseWrapper = new CouchBaseWrapper(taskArguments);
-			HashMap metrics = couchBaseWrapper.gatherMetrics();
-			logger.info("Gathered metrics successfully. Size of metrics: " + metrics.size());
-			printMetrics(metrics);
-			logger.info("Printed metrics successfully");
-			return new TaskOutput("Task successful...");
-		} catch (Exception e) {
-			logger.error("Exception: ", e);
-			System.out.println("In exception");
+	private void printMetric(String metricName, Double metricValue, String aggregation, String timeRollup, String cluster) throws Exception {
+		MetricWriter metricWriter = super.getMetricWriter(METRIC_PREFIX_VALUE + metricName, aggregation, timeRollup, cluster);
+		if (metricValue != null) {
+			metricWriter.printMetric(String.valueOf((long) metricValue.doubleValue()));
 		}
-		return new TaskOutput("Task failed with errors");
 	}
 
 	/**
@@ -142,40 +172,13 @@ public class CouchBaseMonitor extends AManagedMonitor {
 	 * @param metricsMap
 	 *            Map containing metrics
 	 */
-	private void printMetricsHelper(String metricPrefix, Map metricsMap) throws Exception {
-		HashMap<String, Number> metrics = (HashMap<String, Number>) metricsMap;
-		Iterator iterator = metrics.keySet().iterator();
-		while (iterator.hasNext()) {
-			String metricName = iterator.next().toString();
-			Number metric = metrics.get(metricName);
+	private void printMetricsHelper(String metricPrefix, Map<String, Double> metricsMap) throws Exception {
+		for (Map.Entry<String, Double> entry : metricsMap.entrySet()) {
+			String metricName = entry.getKey();
+			Double metric = entry.getValue();
 			if (!disabledMetrics.contains(metricName)) {
 				printMetric(metricPrefix + metricName, metric, MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
 						MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE, MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_INDIVIDUAL);
-			}
-		}
-	}
-
-	/**
-	 * Prints metrics for a cluster, nodes, or buckets
-	 * 
-	 * @param metricPrefix
-	 *            Prefix identifying the metric to be a cluster, node, or bucket
-	 *            metric
-	 * @param id
-	 *            Identifies the node or bucket id
-	 * @param metricsMap
-	 *            Map containing metrics
-	 */
-	private void printMetrics(String metricPrefix, String id, HashMap metricsMap) throws Exception {
-		if (id.equals("")) {
-			printMetricsHelper(metricPrefix, metricsMap);
-		} else {
-			Iterator iterator = metricsMap.entrySet().iterator();
-			while (iterator.hasNext()) {
-				Map.Entry<String, HashMap> mapEntry = (Map.Entry<String, HashMap>) iterator.next();
-				String hostName = mapEntry.getKey();
-				HashMap<String, Number> metricStats = mapEntry.getValue();
-				printMetricsHelper(metricPrefix + id + hostName + "|", metricStats);
 			}
 		}
 	}
@@ -189,7 +192,6 @@ public class CouchBaseMonitor extends AManagedMonitor {
 	 */
 	private void populateDisabledMetrics(String filePath) throws Exception {
 		BufferedInputStream configFile = null;
-
 		try {
 			configFile = new BufferedInputStream(new FileInputStream(filePath));
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -216,24 +218,34 @@ public class CouchBaseMonitor extends AManagedMonitor {
 			logger.error("Could not parse metric name");
 			throw e;
 		} finally {
-			configFile.close();
+			try {
+				if (configFile != null) {
+					configFile.close();
+				}
+			} catch (Exception e2) {
+				// TODO: handle exception
+			}
 		}
+	}
+
+	private String getConfigFilename(String filename) {
+		if (filename == null) {
+			return "";
+		}
+		// for absolute paths
+		if (new File(filename).exists()) {
+			return filename;
+		}
+		// for relative paths
+		File jarPath = PathResolver.resolveDirectory(AManagedMonitor.class);
+		String configFileName = "";
+		if (!Strings.isNullOrEmpty(filename)) {
+			configFileName = jarPath + File.separator + filename;
+		}
+		return configFileName;
 	}
 
 	private static String getImplementationVersion() {
 		return CouchBaseMonitor.class.getPackage().getImplementationTitle();
 	}
-
-	public static void main(String[] args) throws Exception {
-		Map<String, String> taskArguments = new HashMap<String, String>();
-		taskArguments.put("host", "localhost");
-		taskArguments.put("port", "8091");
-		taskArguments.put("username", "");
-		taskArguments.put("password", "");
-		taskArguments.put("disabled-metrics-path", "conf/DisabledMetrics.xml");
-
-		CouchBaseMonitor monitor = new CouchBaseMonitor();
-		monitor.execute(taskArguments, null);
-	}
-
 }
