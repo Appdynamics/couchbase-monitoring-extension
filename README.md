@@ -13,19 +13,19 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 2. Deploy the file CouchBaseMonitor.zip found in the 'target' directory into `<MACHINE_AGENT_HOME>/monitors/` directory.
 3. Unzip the deployed file.
 4. Open `<MACHINE_AGENT_HOME>/monitors/CouchBaseMonitor/monitor.xml` and configure the CouchBase parameters.
-```
+  ```
 &lt;argument name="host" is-required="true" default-value="localhost"/&gt;
 &lt;argument name="port" is-required="true" default-value="8091"/&gt;
 &lt;argument name="username" is-required="true" default-value="username"/&gt;
 &lt;argument name="password" is-required="true" default-value="password"/&gt;
 &lt;argument name="disabled-metrics-path" is-required="false" default-value="monitors/CouchBaseMonitor/conf/DisabledMetrics.xml"/&gt;
 &lt;argument name="metric-prefix" is-required="false" default-value="Custom Metrics|Couchbase|"/&gt;
-```
+  ```
 5. Open `<MACHINE_AGENT_HOME>/monitors/CouchBaseMonitor/conf/DisabledMetrics.xml` and configure the list of disabled metrics. Here is a sample configuration of the disabled metrics:
-```
+  ```
 &lt;Metric name="mem_free"/&gt;
 &lt;Metric name="mem_total"/&gt;
-```
+  ```
 6. Restart the machine agent.
 
 In the AppDynamics Metric Browser, look for: Application Infrastructure Performance | &lt;Tier&gt; | Custom Metrics | CouchBase
