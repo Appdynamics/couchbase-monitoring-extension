@@ -15,19 +15,19 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 4. Open `<MACHINE_AGENT_HOME>/monitors/CouchBaseMonitor/monitor.xml` and configure the CouchBase parameters.
   ```
 
-    &lt;argument name="host" is-required="true" default-value="localhost"/&gt;
-    &lt;argument name="port" is-required="true" default-value="8091"/&gt;
-    &lt;argument name="username" is-required="true" default-value="username"/&gt;
-    &lt;argument name="password" is-required="true" default-value="password"/&gt;
-    &lt;argument name="disabled-metrics-path" is-required="false" default-value="monitors/CouchBaseMonitor/conf/DisabledMetrics.xml"/&gt;
-    &lt;argument name="metric-prefix" is-required="false" default-value="Custom Metrics|Couchbase|"/&gt;
+    <argument name="host" is-required="true" default-value="localhost">
+    <argument name="port" is-required="true" default-value="8091">
+    <argument name="username" is-required="true" default-value="username">
+    <argument name="password" is-required="true" default-value="password">
+    <argument name="disabled-metrics-path" is-required="false" default-value="monitors/CouchBaseMonitor/conf/DisabledMetrics.xml">
+    <argument name="metric-prefix" is-required="false" default-value="Custom Metrics|Couchbase|">
     
   ```
 5. Open `<MACHINE_AGENT_HOME>/monitors/CouchBaseMonitor/conf/DisabledMetrics.xml` and configure the list of disabled metrics. Here is a sample configuration of the disabled metrics:
   ```
 
-    &lt;Metric name="mem_free"/&gt;
-    &lt;Metric name="mem_total"/&gt;
+    <Metric name="mem_free">
+    <Metric name="mem_total">
     
   ```
 6. Restart the machine agent.
