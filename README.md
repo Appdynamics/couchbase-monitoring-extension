@@ -43,6 +43,17 @@ In the AppDynamics Metric Browser, look for: Application Infrastructure Performa
 |target            | Only obtained when using maven. Run 'mvn clean install' to get the distributable .zip file |
 |pom.xml       | Maven build script to package the project (required only if changing Java code) |
 
+##Password Encryption Support
+
+To avoid setting the clear text password in the monitor.xml. Please follow the process to encrypt the password and set the encrypted password and the key in the monitor.xml 
+1. Download the util jar to encrypt the password from https://github.com/Appdynamics/maven-repo/raw/master/releases/com/appdynamics/appd-exts-commons/1.1.2/appd-exts-commons-1.1.2.jar 
+2. Encrypt password from the commandline 
+java -cp "appd-exts-commons-1.1.2.jar" com.appdynamics.extensions.crypto.Encryptor myKey myPassword 
+3. Add the properties in the monitor.xml. Substitute the default-value 
+<argument name="password-encrypted" is-required="true" default-value="<ENCRYPTED_PASSWORD>"/> 
+<argument name="encryption-key" is-required="false" default-value="myKey"/>
+
+
 ## Metrics
 
 ### Metric Category: Cluster Metrics

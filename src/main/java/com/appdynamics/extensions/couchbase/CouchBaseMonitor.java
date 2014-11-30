@@ -29,6 +29,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.appdynamics.extensions.crypto.CryptoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
@@ -86,6 +87,10 @@ public class CouchBaseMonitor extends AManagedMonitor {
 		try {
 			logger.info("Exceuting CouchBaseMonitor...");
 			taskArguments = ArgumentsValidator.validateArguments(taskArguments, DEFAULT_ARGS);
+            String password = CryptoUtil.getPassword(taskArguments);
+            if(Strings.isNullOrEmpty(password)){
+                taskArguments.put("password",password);
+            }
 			initialize(taskArguments);
 			logger.debug("The task arguments are {} ", taskArguments);
 

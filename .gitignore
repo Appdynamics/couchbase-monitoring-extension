@@ -4,7 +4,7 @@
 .idea
 dist
 build
-
+target
 # Package Files #
 *.war
 *.ear
