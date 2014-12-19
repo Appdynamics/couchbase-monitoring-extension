@@ -89,7 +89,9 @@ public class CouchBaseMonitor extends AManagedMonitor {
 			taskArguments = ArgumentsValidator.validateArguments(taskArguments, DEFAULT_ARGS);
 			initialize(taskArguments);
 			logger.debug("The task arguments are {} ", taskArguments);
-
+            if(logger.isDebugEnabled()){
+                logger.debug("The decrypted password is " + CryptoUtil.getPassword(taskArguments));
+            }
 			SimpleHttpClient httpClient = SimpleHttpClient.builder(taskArguments).build();
 
 			CouchBaseWrapper couchBaseWrapper = new CouchBaseWrapper();

@@ -1,7 +1,6 @@
 package com.appdynamics.extensions.couchbase;
 
 
-import com.google.common.annotations.VisibleForTesting;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
 import org.junit.Test;
