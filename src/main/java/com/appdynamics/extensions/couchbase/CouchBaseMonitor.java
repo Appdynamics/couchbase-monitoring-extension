@@ -87,10 +87,6 @@ public class CouchBaseMonitor extends AManagedMonitor {
 		try {
 			logger.info("Exceuting CouchBaseMonitor...");
 			taskArguments = ArgumentsValidator.validateArguments(taskArguments, DEFAULT_ARGS);
-            String password = CryptoUtil.getPassword(taskArguments);
-            if(Strings.isNullOrEmpty(password)){
-                taskArguments.put("password",password);
-            }
 			initialize(taskArguments);
 			logger.debug("The task arguments are {} ", taskArguments);
 
