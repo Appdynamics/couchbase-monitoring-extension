@@ -55,7 +55,7 @@ public class CouchBaseMonitor extends AManagedMonitor {
 	private static final String BUCKET_STATS_PREFIX = "Bucket Stats|";
 	private static final String NODE_STATS_PREFIX = "Node Stats|";
 	private static final String CLUSTER_STATS_PREFIX = "Cluster Stats|";
-	private static final String METRIC_SEPARATOR = "|";
+	public static final String METRIC_SEPARATOR = "|";
 	private static final String DISABLED_METRICS_PATH = "disabled-metrics-path";
 	private static final String DISABLED_METRICS_XML = "monitors/CouchBaseMonitor/DisabledMetrics.xml";
 	private static String METRIC_PREFIX_VALUE = "Custom Metrics|Couchbase|";
@@ -99,9 +99,15 @@ public class CouchBaseMonitor extends AManagedMonitor {
 			printClusterNodeMetrics(clusterNodeMetrics);
 			Map<String, Map<String, Double>> bucketMetrics = couchBaseWrapper.gatherBucketMetrics(httpClient);
 			printBucketMetrics(bucketMetrics);
+			
+			if (bucketMetrics != null && !bucketMetrics.isEmpty()) {
+				Map<String, Map<String, Double>> bucketReplicationMetrics = couchBaseWrapper.gatherBucketReplicationMetrics(
+						bucketMetrics.keySet(), httpClient);
+				printBucketMetrics(bucketReplicationMetrics);
+			}
 
 			logger.info("Printed metrics successfully");
-			return new TaskOutput("Task successfull...");
+			return new TaskOutput("Task successfully...");
 		} catch (Exception e) {
 			logger.error("Exception: ", e);
 		}

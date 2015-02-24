@@ -15,10 +15,13 @@
  */
 package com.appdynamics.extensions.couchbase;
 
+import static com.appdynamics.extensions.couchbase.CouchBaseMonitor.*;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -37,6 +40,9 @@ public class CouchBaseWrapper {
 	public static final String CLUSTER_STATS_KEY = "Cluster Stats";
 	private static final String CLUSTER_NODE_URI = "/pools/default";
 	private static final String BUCKET_URI = "/pools/default/buckets";
+	private static final String BUCKET_REPLICATION_STATS_URI = BUCKET_URI + "/%s/stats";
+	private static final String REPLICATIONS_KEY = "replications";
+	private static final String REPLICATIONS_SEPARATOR = "/";
 
 	/**
 	 * Gathers Cluster and Node stats. Cluster stats as Map of CLUSTER_STATS_KEY
@@ -75,6 +81,97 @@ public class CouchBaseWrapper {
 			bucketMetrics = populateBucketMetrics(bucketStats);
 		}
 		return bucketMetrics;
+	}
+	
+	/**
+	 * Gathers Bucket Replication stats from /pools/default/buckets/<bucket_name>/stats
+	 * 
+	 * Response contains all other stats but this only filters any stats that starts with 'replications', 
+	 * e.g. replications/03cd3332434401c64594f47eeeabbb79/beer-sample/gamesim-sample/wtavg_meta_latency
+	 * 
+	 * @param buckets
+	 * @param httpClient
+	 * @return Map<String, Map<String, Double>>
+	 */
+	public Map<String, Map<String, Double>> gatherBucketReplicationMetrics(Set<String> buckets, SimpleHttpClient httpClient) {
+		Map<String, Map<String, Double>> replicationMetrics = new HashMap<String, Map<String, Double>>();
+		
+		if (buckets != null) {
+			for (String bucket : buckets) {
+				JsonElement bucketResponse = getResponse(httpClient, 
+						String.format(BUCKET_REPLICATION_STATS_URI, bucket));
+				
+				if (bucketResponse != null && bucketResponse.isJsonObject()) {
+					JsonObject bucketStats = bucketResponse.getAsJsonObject();
+					JsonObject op = bucketStats.getAsJsonObject("op");
+					JsonObject samples = op.getAsJsonObject("samples");
+					populateBucketReplicationMetrics(bucket, samples.entrySet().iterator(), replicationMetrics);
+				}
+			}
+		}
+		
+		return replicationMetrics;
+	}
+
+	private void populateBucketReplicationMetrics(String bucketName, 
+			Iterator<Entry<String, JsonElement>> iterator, 
+			Map<String, Map<String, Double>> replicationMetrics) {
+		
+		while (iterator.hasNext()) {
+			Entry<String, JsonElement> entry = iterator.next();
+			String metricName = (String) entry.getKey();
+			
+			// sample format: replications/03cd3332434401c64594f47eeeabbb79/beer-sample/gamesim-sample/wtavg_meta_latency
+			if (metricName.startsWith(REPLICATIONS_KEY)) {
+				String[] metricNameParts = metricName.split(REPLICATIONS_SEPARATOR);
+				
+				if (metricNameParts != null && metricNameParts.length > 2) {
+					// e.g. gamesim-sample
+					String destinationBucket = metricNameParts[metricNameParts.length - 2];
+					
+					// e.g. wtavg_meta_latency
+					String replicationMetricName = metricNameParts[metricNameParts.length - 1];
+					
+					// e.g. beer-sample|replications|gamesim-sample
+					String metricPrefix = String.format("%s%s%s%s%s", bucketName,
+							METRIC_SEPARATOR, REPLICATIONS_KEY, METRIC_SEPARATOR, destinationBucket);
+					
+					JsonArray replicationStats = (JsonArray) entry.getValue();
+					
+					if (!replicationMetrics.containsKey(metricPrefix)) {
+						replicationMetrics.put(metricPrefix, new HashMap<String, Double>());
+					}
+						
+					populateBucketReplicationMetricsMapHelper(replicationMetricName, replicationStats, 
+							replicationMetrics.get(metricPrefix));
+				}
+			}
+		}
+	}
+
+	private void populateBucketReplicationMetricsMapHelper(String replicationMetricName, 
+			JsonArray replicationStats, Map<String, Double> replicationMetrics) {
+		if (replicationStats != null) {
+			Iterator<JsonElement> stats = replicationStats.iterator();
+			while (stats.hasNext()) {
+				try {
+					Double value = stats.next().getAsDouble();
+					replicationMetrics.put(replicationMetricName, value);
+					break;
+				} catch (ClassCastException ex) {
+					if (logger.isDebugEnabled()) {
+						logger.debug(String.format("Incorrect value type retrieved for %s, ignoring...", 
+								replicationMetricName), ex);
+					}
+				} catch (IllegalStateException ex) {
+					if (logger.isDebugEnabled()) {
+						logger.debug(String.format("Incorrect value type retrieved for %s, ignoring...", 
+								replicationMetricName), ex);
+					}					
+				}
+			}
+		}
+		
 	}
 
 	/**

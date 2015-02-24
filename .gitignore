@@ -8,3 +8,6 @@ target
 # Package Files #
 *.war
 *.ear
+.classpath
+.project
+.settings/
