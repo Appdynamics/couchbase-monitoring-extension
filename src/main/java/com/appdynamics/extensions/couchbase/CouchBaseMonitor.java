@@ -101,9 +101,9 @@ public class CouchBaseMonitor extends AManagedMonitor {
 			printBucketMetrics(bucketMetrics);
 			
 			if (bucketMetrics != null && !bucketMetrics.isEmpty()) {
-				Map<String, Map<String, Double>> bucketReplicationMetrics = couchBaseWrapper.gatherBucketReplicationMetrics(
+				Map<String, Map<String, Double>> otherBucketMetrics = couchBaseWrapper.gatherOtherBucketMetrics(
 						bucketMetrics.keySet(), httpClient);
-				printBucketMetrics(bucketReplicationMetrics);
+				printBucketMetrics(otherBucketMetrics);
 			}
 
 			logger.info("Printed metrics successfully");

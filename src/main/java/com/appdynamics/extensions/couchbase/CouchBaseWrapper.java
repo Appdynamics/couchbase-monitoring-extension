@@ -40,9 +40,10 @@ public class CouchBaseWrapper {
 	public static final String CLUSTER_STATS_KEY = "Cluster Stats";
 	private static final String CLUSTER_NODE_URI = "/pools/default";
 	private static final String BUCKET_URI = "/pools/default/buckets";
-	private static final String BUCKET_REPLICATION_STATS_URI = BUCKET_URI + "/%s/stats";
+	private static final String BUCKET_STATS_URI = BUCKET_URI + "/%s/stats";
 	private static final String REPLICATIONS_KEY = "replications";
-	private static final String REPLICATIONS_SEPARATOR = "/";
+	private static final String BUCKET_EP_METRIC_PREFIX = "ep_";
+	private static final String PATH_SEPARATOR = "/";
 
 	/**
 	 * Gathers Cluster and Node stats. Cluster stats as Map of CLUSTER_STATS_KEY
@@ -93,80 +94,93 @@ public class CouchBaseWrapper {
 	 * @param httpClient
 	 * @return Map<String, Map<String, Double>>
 	 */
-	public Map<String, Map<String, Double>> gatherBucketReplicationMetrics(Set<String> buckets, SimpleHttpClient httpClient) {
-		Map<String, Map<String, Double>> replicationMetrics = new HashMap<String, Map<String, Double>>();
+	public Map<String, Map<String, Double>> gatherOtherBucketMetrics(Set<String> buckets, SimpleHttpClient httpClient) {
+		Map<String, Map<String, Double>> otherBucketMetrics = new HashMap<String, Map<String, Double>>();
 		
 		if (buckets != null) {
 			for (String bucket : buckets) {
 				JsonElement bucketResponse = getResponse(httpClient, 
-						String.format(BUCKET_REPLICATION_STATS_URI, bucket));
+						String.format(BUCKET_STATS_URI, bucket));
 				
 				if (bucketResponse != null && bucketResponse.isJsonObject()) {
 					JsonObject bucketStats = bucketResponse.getAsJsonObject();
 					JsonObject op = bucketStats.getAsJsonObject("op");
 					JsonObject samples = op.getAsJsonObject("samples");
-					populateBucketReplicationMetrics(bucket, samples.entrySet().iterator(), replicationMetrics);
+					populateOtherBucketMetrics(bucket, samples.entrySet().iterator(), otherBucketMetrics);
 				}
 			}
 		}
 		
-		return replicationMetrics;
+		return otherBucketMetrics;
 	}
 
-	private void populateBucketReplicationMetrics(String bucketName, 
+	private void populateOtherBucketMetrics(String bucketName, 
 			Iterator<Entry<String, JsonElement>> iterator, 
-			Map<String, Map<String, Double>> replicationMetrics) {
+			Map<String, Map<String, Double>> otherBucketMetrics) {
 		
 		while (iterator.hasNext()) {
 			Entry<String, JsonElement> entry = iterator.next();
 			String metricName = (String) entry.getKey();
+			JsonArray stats = (JsonArray) entry.getValue();
 			
 			// sample format: replications/03cd3332434401c64594f47eeeabbb79/beer-sample/gamesim-sample/wtavg_meta_latency
 			if (metricName.startsWith(REPLICATIONS_KEY)) {
-				String[] metricNameParts = metricName.split(REPLICATIONS_SEPARATOR);
+				populateBucketReplicationMetrics(bucketName, metricName, stats, otherBucketMetrics);
 				
-				if (metricNameParts != null && metricNameParts.length > 2) {
-					// e.g. gamesim-sample
-					String destinationBucket = metricNameParts[metricNameParts.length - 2];
-					
-					// e.g. wtavg_meta_latency
-					String replicationMetricName = metricNameParts[metricNameParts.length - 1];
-					
-					// e.g. beer-sample|replications|gamesim-sample
-					String metricPrefix = String.format("%s%s%s%s%s", bucketName,
-							METRIC_SEPARATOR, REPLICATIONS_KEY, METRIC_SEPARATOR, destinationBucket);
-					
-					JsonArray replicationStats = (JsonArray) entry.getValue();
-					
-					if (!replicationMetrics.containsKey(metricPrefix)) {
-						replicationMetrics.put(metricPrefix, new HashMap<String, Double>());
-					}
-						
-					populateBucketReplicationMetricsMapHelper(replicationMetricName, replicationStats, 
-							replicationMetrics.get(metricPrefix));
+			} else if (metricName.startsWith(BUCKET_EP_METRIC_PREFIX)) {
+				
+				if (!otherBucketMetrics.containsKey(bucketName)) {
+					otherBucketMetrics.put(bucketName, new HashMap<String, Double>());
 				}
+				
+				populateOtherBucketMetricsMapHelper(metricName, stats, 
+						otherBucketMetrics.get(bucketName));
 			}
 		}
 	}
+	
+	private void populateBucketReplicationMetrics(String bucketName, String metricName, 
+			JsonArray stats, Map<String, Map<String, Double>> otherBucketMetrics) {
+		String[] metricNameParts = metricName.split(PATH_SEPARATOR);
+		
+		if (metricNameParts != null && metricNameParts.length > 2) {
+			// e.g. gamesim-sample
+			String destinationBucket = metricNameParts[metricNameParts.length - 2];
+			
+			// e.g. wtavg_meta_latency
+			String replicationMetricName = metricNameParts[metricNameParts.length - 1];
+			
+			// e.g. beer-sample|replications|gamesim-sample
+			String metricPrefix = String.format("%s%s%s%s%s", bucketName,
+					METRIC_SEPARATOR, REPLICATIONS_KEY, METRIC_SEPARATOR, destinationBucket);
+			
+			if (!otherBucketMetrics.containsKey(metricPrefix)) {
+				otherBucketMetrics.put(metricPrefix, new HashMap<String, Double>());
+			}
+				
+			populateOtherBucketMetricsMapHelper(replicationMetricName, stats, 
+					otherBucketMetrics.get(metricPrefix));
+		}
+	}
 
-	private void populateBucketReplicationMetricsMapHelper(String replicationMetricName, 
-			JsonArray replicationStats, Map<String, Double> replicationMetrics) {
+	private void populateOtherBucketMetricsMapHelper(String metricName, 
+			JsonArray replicationStats, Map<String, Double> bucketMetrics) {
 		if (replicationStats != null) {
 			Iterator<JsonElement> stats = replicationStats.iterator();
 			while (stats.hasNext()) {
 				try {
 					Double value = stats.next().getAsDouble();
-					replicationMetrics.put(replicationMetricName, value);
+					bucketMetrics.put(metricName, value);
 					break;
 				} catch (ClassCastException ex) {
 					if (logger.isDebugEnabled()) {
 						logger.debug(String.format("Incorrect value type retrieved for %s, ignoring...", 
-								replicationMetricName), ex);
+								metricName), ex);
 					}
 				} catch (IllegalStateException ex) {
 					if (logger.isDebugEnabled()) {
 						logger.debug(String.format("Incorrect value type retrieved for %s, ignoring...", 
-								replicationMetricName), ex);
+								metricName), ex);
 					}					
 				}
 			}
