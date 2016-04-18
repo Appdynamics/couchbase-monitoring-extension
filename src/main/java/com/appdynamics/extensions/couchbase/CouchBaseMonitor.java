@@ -92,21 +92,30 @@ public class CouchBaseMonitor extends AManagedMonitor {
             if(logger.isDebugEnabled()){
                 logger.debug("The decrypted password is " + CryptoUtil.getPassword(taskArguments));
             }
-			SimpleHttpClient httpClient = SimpleHttpClient.builder(taskArguments).build();
+			SimpleHttpClient httpClient = null;
+			try {
 
-			CouchBaseWrapper couchBaseWrapper = new CouchBaseWrapper();
-			Map<String, Map<String, Double>> clusterNodeMetrics = couchBaseWrapper.gatherClusterNodeMetrics(httpClient);
-			printClusterNodeMetrics(clusterNodeMetrics);
-			Map<String, Map<String, Double>> bucketMetrics = couchBaseWrapper.gatherBucketMetrics(httpClient);
-			printBucketMetrics(bucketMetrics);
-			
-			if (bucketMetrics != null && !bucketMetrics.isEmpty()) {
-				Map<String, Map<String, Double>> otherBucketMetrics = couchBaseWrapper.gatherOtherBucketMetrics(
-						bucketMetrics.keySet(), httpClient);
-				printBucketMetrics(otherBucketMetrics);
+				httpClient = SimpleHttpClient.builder(taskArguments).build();
+
+				CouchBaseWrapper couchBaseWrapper = new CouchBaseWrapper();
+				Map<String, Map<String, Double>> clusterNodeMetrics = couchBaseWrapper.gatherClusterNodeMetrics(httpClient);
+				printClusterNodeMetrics(clusterNodeMetrics);
+				Map<String, Map<String, Double>> bucketMetrics = couchBaseWrapper.gatherBucketMetrics(httpClient);
+				printBucketMetrics(bucketMetrics);
+
+				if (bucketMetrics != null && !bucketMetrics.isEmpty()) {
+					Map<String, Map<String, Double>> otherBucketMetrics = couchBaseWrapper.gatherOtherBucketMetrics(
+							bucketMetrics.keySet(), httpClient);
+					printBucketMetrics(otherBucketMetrics);
+				}
+
+				logger.info("Printed metrics successfully");
 			}
-
-			logger.info("Printed metrics successfully");
+			finally{
+				if(httpClient != null){
+					httpClient.close();
+				}
+			}
 			return new TaskOutput("Task successfully...");
 		} catch (Exception e) {
 			logger.error("Exception: ", e);
