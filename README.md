@@ -116,15 +116,15 @@ java -cp "appd-exts-commons-1.1.2.jar" com.appdynamics.extensions.crypto.Encrypt
 
 ![](https://raw.github.com/Appdynamics/couchbase-monitoring-extension/master/CouchBase%20Dashboard.png)
 
-##Contributing
+## Contributing
 
 Always feel free to fork and contribute any changes directly here on GitHub.
 
-##Community
+## Community
 
 Find out more in the [AppSphere](http://appsphere.appdynamics.com/t5/eXchange/CouchBase---Monitoring-Extension/idi-p/5567) community.
 
-##Support
+## Support
 
 For any questions or feature request, please contact [AppDynamics Center of Excellence](mailto:ace-request@appdynamics.com).
 
