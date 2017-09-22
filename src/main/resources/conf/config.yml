@@ -1,0 +1,129 @@
+#This will populate the metrics in all the tiers, under this path(not recommended)
+#metricPrefix: "Custom Metrics|CouchBase"
+#The following prefix will populate the metrics under one tier
+metricPrefix: "Server|Component:AppLevels|Custom Metrics|CouchBase"
+
+#Add your list of CouchBase clusters here.
+servers:
+  - name: "Cluster1"
+    host: "localhost"
+    port: "6379"
+    username: ""
+    password: ""
+    passwordEncrypted: ""
+
+#Encryption key for Encrypted password.
+encryptionKey: ""
+
+# Each server instance needs 3 threads, one for the server instance itself, one for info call to the Redis server and one for slowlog call to the server.
+# So, please change the value accordingly(Based on the number of server instances you are monitoring).
+numberOfThreads: 20
+
+metrics:
+    cluster:
+        include: "true"
+        ram:
+            - total:
+                  alias: "total"
+            - quotaTotal:
+                  alias: "quotaTotal"
+            - quotaUsed:
+                  alias: "quotaUsed"
+            - used:
+                  alias: "used"
+            - usedByData:
+                  alias: "usedByData"
+            - quotaUsedPerNode:
+                  alias: "quotaUsedPerNode"
+            - quotaTotalPerNode:
+                  alias: "quotaTotalPerNode"
+        hdd:
+            - total:
+                  alias: "total"
+            - quotaTotal:
+                  alias: "quotaTotal"
+            - used:
+                  alias: "used"
+            - usedByData:
+                  alias: "usedByData"
+            - free:
+                  alias: "free"
+        counters:
+            - rebalance_success:
+                  alias: "rebalance_success"
+            - rebalance_start:
+                  alias: "rebalance_start"
+        others:
+    nodes:
+        include: "true"
+        systemStats:
+            - cpu_utilization_rate:
+                  alias: "cpu_utilization_rate"
+            - swap_total:
+                  alias: "swap_total"
+            - swap_used:
+                  alias: "swap_used"
+            - mem_total:
+                  alias: "mem_total"
+            - mem_free:
+                  alias: "mem_free"
+        interestingStats:
+            - cmd_get:
+                  alias: "cmd_get"
+            - couch_docs_actual_disk_size:
+                  alias: "couch_docs_actual_disk_size"
+            - couch_docs_data_size:
+                  alias: "couch_docs_data_size"
+            - couch_spatial_data_size:
+                  alias: "couch_spatial_data_size"
+            - couch_spatial_disk_size:
+                  alias: "couch_spatial_disk_size"
+            - couch_views_actual_disk_size:
+                  alias: "couch_views_actual_disk_size"
+            - couch_views_data_size:
+                  alias: "couch_views_data_size"
+            - curr_items:
+                  alias: "curr_items"
+            - curr_items_tot:
+                  alias: "curr_items_tot"
+            - ep_bg_fetched:
+                  alias: "ep_bg_fetched"
+            - get_hits:
+                  alias: "get_hits"
+            - mem_used:
+                  alias: "mem_used"
+            - ops:
+                  alias: "ops"
+            - vb_replica_curr_items:
+                  alias: "vb_replica_curr_items"
+        otherStats:
+    bucket:
+        include: "true"
+        quota:
+        basicStats:
+        otherStats:
+    query:
+        include: "true"
+        systemVitals:
+            - request.completed.count:
+                  alias: "request.completed.count"
+            - request.active.count:
+                  alias: "request.active.count"
+            - request.per.sec.1min:
+                  alias: "request.per.sec.1min"
+            - request.per.sec.5min:
+                  alias: "request.per.sec.5min"
+            - request.per.sec.15min:
+                  alias: "request.per.sec.15min"
+            - request_time.mean:
+                  alias: "request_time.mean"
+            - request_time.median:
+                  alias: "request_time.median"
+            - request_time.80percentile:
+                  alias: "request_time.80percentile"
+            - request_time.95percentile:
+                  alias: "request_time.95percentile"
+            - request_time.99percentile:
+                  alias: "request_time.99percentile"
+
+

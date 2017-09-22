@@ -2,26 +2,25 @@
         <name>CouchBaseMonitor</name>
         <type>managed</type>
         <description>CouchBase Monitor</description>
-        <monitor-configuration></monitor-configuration>
+        <enabled>true</enabled>
+        <description>Monitors a CouchBase cluster</description>
+        <monitor-configuration>
+        </monitor-configuration>
         <monitor-run-task>
-                <execution-style>periodic</execution-style>
-                <execution-frequency-in-seconds>60</execution-frequency-in-seconds>
                 <name>CouchBase Monitor Run Task</name>
                 <display-name>CouchBase Monitor Task</display-name>
                 <description>CouchBase Monitor Task</description>
                 <type>java</type>
+                <execution-style>periodic</execution-style>
+                <execution-frequency-in-seconds>60</execution-frequency-in-seconds>
                 <execution-timeout-in-secs>60</execution-timeout-in-secs>
+                <task-arguments>
+                    <!-- config file-->
+                    <argument name="config-file" is-required="true" default-value="monitors/CouchBaseMonitor/config.yml" />
+                </task-arguments>
                 <java-task>
                     <classpath>couchbase-monitoring-extension.jar</classpath>
                         <impl-class>com.appdynamics.extensions.couchbase.CouchBaseMonitor</impl-class>
                 </java-task>
-                <task-arguments>
-                    <argument name="host" is-required="true" default-value="localhost"/>
-                    <argument name="port" is-required="true" default-value="8091"/>
-                    <argument name="username" is-required="true" default-value=""/>
-                    <argument name="password" is-required="true" default-value=""/>
-                    <argument name="disabled-metrics-path" is-required="false" default-value="monitors/CouchBaseMonitor/DisabledMetrics.xml"/>
-                    <argument name="metric-prefix" is-required="false" default-value="Custom Metrics|Couchbase|"/>
-                </task-arguments>
         </monitor-run-task>
 </monitor>
