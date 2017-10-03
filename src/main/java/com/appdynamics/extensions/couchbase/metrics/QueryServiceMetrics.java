@@ -1,5 +1,6 @@
 package com.appdynamics.extensions.couchbase.metrics;
 
+import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
 import com.appdynamics.extensions.http.HttpClientUtils;
 import com.appdynamics.extensions.metrics.Metric;
@@ -13,8 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-import static com.appdynamics.extensions.couchbase.utils.Constants.BUCKETS_ENDPOINT;
-import static com.appdynamics.extensions.couchbase.utils.Constants.QUERY_SERVICE_URL;
+import static com.appdynamics.extensions.couchbase.utils.Constants.*;
 
 /**
  * Created by venkata.konala on 9/20/17.
@@ -23,45 +23,42 @@ public class QueryServiceMetrics implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(QueryServiceMetrics.class);
     private MonitorConfiguration configuration;
-    private CloseableHttpClient httpClient;
+    private String clusterName;
     private String serverURL;
+    private Map<String, ?> queryMap;
     private CountDownLatch countDownLatch;
+    private CloseableHttpClient httpClient;
+    private MetricWriteHelper metricWriteHelper;
 
-    public QueryServiceMetrics(MonitorConfiguration configuration, CloseableHttpClient httpClient, String serverURL, CountDownLatch countDownLatch){
+    public QueryServiceMetrics(MonitorConfiguration configuration, String clusterName, String serverURL, Map<String, ?> metricsMap, CountDownLatch countDownLatch){
         this.configuration = configuration;
-        this.httpClient = httpClient;
+        this.clusterName = clusterName;
         this.serverURL = serverURL;
+        this.queryMap = (Map<String, ?>) metricsMap.get("query");;
         this.countDownLatch = countDownLatch;
+        this.httpClient = this.configuration.getHttpClient();
+        this.metricWriteHelper = this.configuration.getMetricWriter();
     }
 
     public void run() {
         List<Metric> queryMetricsList = gatherQueryMetrics();
-        configuration.getMetricWriter().transformAndPrintNodeLevelMetrics(queryMetricsList);
+        metricWriteHelper.transformAndPrintNodeLevelMetrics(queryMetricsList);
         countDownLatch.countDown();
     }
 
     private List<Metric> gatherQueryMetrics(){
         List<Metric> queryMetricsList = Lists.newArrayList();
-        Map<String, ?> metricsMap = (Map<String, ?>)configuration.getConfigYml().get("metrics");
-        Map<String, ?> queryMap = (Map<String, ?>)metricsMap.get("query");
+        Map<String, ?> credentialsMap = (Map<String, ?>) queryMap.get("credentials");
         List<Map<String, ?>> vitalsList = (List<Map<String, ?>>)queryMap.get("systemVitals");
-        JsonNode rootJsonNode = HttpClientUtils.getResponseAsJson(httpClient, String.format(serverURL + QUERY_SERVICE_URL, queryMap.get("host").toString(), Integer.parseInt(queryMap.get("port").toString())), JsonNode.class);
-        //#TODO take care of the metricPath
-        queryMetricsList.addAll(getMetrics("", vitalsList, rootJsonNode));
-        return queryMetricsList;
-    }
-
-    private List<Metric> getMetrics(String metricPath, List<Map<String, ?>> metricsList, JsonNode jsonNode){
-        List<Metric> metricList = Lists.newArrayList();
-        for(Map<String, ?> metric : metricsList){
-            String metricName = metric.entrySet().iterator().next().getKey();
-            Map<String, ?> metricProperties = (Map<String, ?>)metric.entrySet().iterator().next().getValue();
-            JsonNode jsonValue = jsonNode.get(metricName);
-            if(jsonNode.has(metricName) && !jsonValue.isNull() && jsonValue.isValueNode()){
-                Metric individualMetric = new Metric(metricName, jsonValue.getTextValue(), metricPath, metricProperties);
-                metricList.add(individualMetric);
-            }
+        if(credentialsMap != null  && credentialsMap.get("host") != null && credentialsMap.get("port") != null) {
+            String url = String.format(serverURL + QUERY_SERVICE_URL, credentialsMap.get("host").toString(), Integer.parseInt(credentialsMap.get("port").toString()));
+            JsonNode rootJsonNode = HttpClientUtils.getResponseAsJson(httpClient, url, JsonNode.class);
+            //#TODO take care of the metricPath
+            queryMetricsList.addAll(getMetrics(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR +"query", vitalsList, rootJsonNode));
         }
-        return metricList;
+        else{
+            logger.debug("Credentials for getting Query metrics are not specified under the 'query' section");
+        }
+        return queryMetricsList;
     }
 }

@@ -97,9 +97,13 @@ metrics:
             - vb_replica_curr_items:
                   alias: "vb_replica_curr_items"
         otherStats:
-    buckets:
+    bucket:
         include: "true"
         quota:
+            - ram:
+                  alias: "ram"
+            - rawRAM:
+                  alias: "rawRAM"
         basicStats:
             - quotaPercentUsed:
                   alias: "quotaPercentUsed"
@@ -147,8 +151,8 @@ metrics:
     xdcr:
         include: "true"
         stats:
-            - bandwidth_usage: #Bandwidth used during replication, measured in bytes per second.
-            - changes_left: #Number of updates still pending replication.
+           # - bandwidth_usage: #Bandwidth used during replication, measured in bytes per second.
+           # - changes_left: #Number of updates still pending replication.
             - data_replicated: #Size of data replicated in bytes.
             - docs_checked: #Number of documents checked for changes.
             - docs_failed_cr_source: #Number of documents that have failed conflict resolution on the source cluster and not replicated to target cluster.
@@ -165,12 +169,5 @@ metrics:
             - rate_replication: #Rate of documents being replicated, measured in documents per second.
             - size_rep_queue: #Size of replication queue in bytes.
             - time_committing: #Seconds elapsed during replication.
-    index:
-        include: "true"
-        stats:
-            - memorySnapshotInterval:
-            - stableSnapshotInterval:
-            - maxRollbackPoints:
-
 
 
