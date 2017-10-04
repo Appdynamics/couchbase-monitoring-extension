@@ -1,4 +1,4 @@
-package com.appdynamics.extensions.couchbase.metrics;
+package com.appdynamics.extensions.couchbase.metrics.xdcr;
 
 import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.MonitorExecutorService;
@@ -46,10 +46,15 @@ public class XDCRMetrics implements Runnable{
     }
 
     public void run() {
-        gatherXDCRBucketsSet();
-        List<Map<String, ?>> xdcrMetricsList = (List<Map<String, ?>>)xdcrMap.get("stats");
-        if(xdcrBucketsSet.size() != 0) {
-            getIndividualBucketXDCRMetrics(xdcrMetricsList);
+        if(xdcrMap != null && xdcrMap.get("include") != null && xdcrMap.get("include").toString().equalsIgnoreCase("true")) {
+            gatherXDCRBucketsSet();
+            List<Map<String, ?>> xdcrMetricsList = (List<Map<String, ?>>) xdcrMap.get("stats");
+            if (xdcrBucketsSet.size() != 0) {
+                getIndividualBucketXDCRMetrics(xdcrMetricsList);
+            }
+        }
+        else{
+            logger.debug("The metrics in 'xdcr' section are not processed either because it is not present (or) 'include' parameter is either null or false");
         }
         countDownLatch.countDown();
     }

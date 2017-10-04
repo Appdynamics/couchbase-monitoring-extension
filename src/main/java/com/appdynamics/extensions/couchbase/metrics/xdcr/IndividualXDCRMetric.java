@@ -1,4 +1,4 @@
-package com.appdynamics.extensions.couchbase.metrics;
+package com.appdynamics.extensions.couchbase.metrics.xdcr;
 
 import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
@@ -15,9 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-import static com.appdynamics.extensions.couchbase.utils.Constants.INDIVIDUAL_BUCKET_WITHOUT_ZOOM_ENDPPOINT;
-import static com.appdynamics.extensions.couchbase.utils.Constants.METRIC_SEPARATOR;
-import static com.appdynamics.extensions.couchbase.utils.Constants.XDCR_ENDPOINT;
+import static com.appdynamics.extensions.couchbase.utils.Constants.*;
 
 /**
  * Created by venkata.konala on 10/3/17.
@@ -66,17 +64,18 @@ public class IndividualXDCRMetric implements Runnable{
             JsonNode xdcrNode = HttpClientUtils.getResponseAsJson(httpClient, serverURL + bucketEndPoint + xdcrEndPoint + "?zoom=day", JsonNode.class);
             if(xdcrNode != null){
                 JsonNode nodeStats = xdcrNode.get("nodeStats");
+                //int size = nodeStats.size();
+                //Iterator<JsonNode> sample =  nodeStats.getElements();
                 if(nodeStats != null){
-                    for(JsonNode ip : nodeStats){
-                        JsonNode jsonValue = nodeStats.get(ip.asText());
+                    for(JsonNode jsonValue : nodeStats){
                         if(jsonValue.isArray()){
                             JsonNode lastJasonValue = jsonValue.get(jsonValue.size() - 1);
                             Metric individualMetric;
                             if(metricProperties != null){
-                                individualMetric = new Metric(metricName, lastJasonValue.asText(), configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "xdcr" + METRIC_SEPARATOR + bucketName + METRIC_SEPARATOR + ip.asText() + METRIC_SEPARATOR + metricName, metricProperties);
+                                individualMetric = new Metric(metricName, lastJasonValue.asText(), configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "xdcr" + METRIC_SEPARATOR + bucketName  + METRIC_SEPARATOR + metricName, metricProperties);
                             }
                             else{
-                                individualMetric = new Metric(metricName, lastJasonValue.asText(), configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "xdcr" + METRIC_SEPARATOR + bucketName + METRIC_SEPARATOR + ip.asText() + METRIC_SEPARATOR + metricName);
+                                individualMetric = new Metric(metricName, lastJasonValue.asText(), configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "xdcr" + METRIC_SEPARATOR + bucketName  + METRIC_SEPARATOR + metricName);
                             }
                             xdcrMetricList.add(individualMetric);
                         }

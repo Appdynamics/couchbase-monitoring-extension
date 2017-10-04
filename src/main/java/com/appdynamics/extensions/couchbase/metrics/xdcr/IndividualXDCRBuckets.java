@@ -1,15 +1,15 @@
-package com.appdynamics.extensions.couchbase.metrics;
+package com.appdynamics.extensions.couchbase.metrics.xdcr;
 
 import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.MonitorExecutorService;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
 import com.appdynamics.extensions.metrics.Metric;
+import com.appdynamics.extensions.util.AssertUtils;
 import com.google.common.collect.Lists;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.plaf.metal.MetalRadioButtonUI;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -37,9 +37,12 @@ public class IndividualXDCRBuckets implements Runnable {
         this.clusterName = clusterName;
         this.serverURl = serverURL;
         this.xdcrBucketNode = xdcrBucketNode;
+        AssertUtils.assertNotNull(xdcrMetricsList, "The stats section under xdcr group is either null or empty");
         this.xdcrMetricsList = xdcrMetricsList;
         this.countDownLatch = countDownLatch;
         this.httpClient = this.configuration.getHttpClient();
+        this.metricWriteHelper = this.configuration.getMetricWriter();
+        this.executorService = this.configuration.getExecutorService();
     }
 
     public void run(){
@@ -48,8 +51,6 @@ public class IndividualXDCRBuckets implements Runnable {
     }
 
     private void gatherAndPrintBucketXDCRMetrics(){
-
-
         String id = xdcrBucketNode.get("id").asText();
         String idSplit[] = id.split("/");
         String remote_uuid = idSplit[0];
@@ -64,7 +65,7 @@ public class IndividualXDCRBuckets implements Runnable {
         CountDownLatch latch = new CountDownLatch(xdcrMetricsList.size());
         for (Map<String, ?> metric : xdcrMetricsList) {
             IndividualXDCRMetric individualXDCRMetricTask = new IndividualXDCRMetric(configuration, clusterName, serverURl, metric, remote_uuid, bucketName, destinationName,latch);
-            executorService.submit(id + metric.entrySet().iterator().next().getKey(), individualXDCRMetricTask);
+            executorService.submit(id + " " + metric.entrySet().iterator().next().getKey(), individualXDCRMetricTask);
         }
         try {
             latch.await();

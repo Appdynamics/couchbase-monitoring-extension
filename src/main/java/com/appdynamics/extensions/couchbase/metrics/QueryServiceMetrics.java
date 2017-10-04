@@ -41,8 +41,13 @@ public class QueryServiceMetrics implements Runnable {
     }
 
     public void run() {
-        List<Metric> queryMetricsList = gatherQueryMetrics();
-        metricWriteHelper.transformAndPrintNodeLevelMetrics(queryMetricsList);
+        if(queryMap != null && queryMap.get("include") != null && queryMap.get("include").toString().equalsIgnoreCase("true")) {
+            List<Metric> queryMetricsList = gatherQueryMetrics();
+            metricWriteHelper.transformAndPrintNodeLevelMetrics(queryMetricsList);
+        }
+        else{
+            logger.debug("The metrics in 'query' section are not processed either because it is not present (or) 'include' parameter is either null or false");
+        }
         countDownLatch.countDown();
     }
 
@@ -53,11 +58,10 @@ public class QueryServiceMetrics implements Runnable {
         if(credentialsMap != null  && credentialsMap.get("host") != null && credentialsMap.get("port") != null) {
             String url = String.format(serverURL + QUERY_SERVICE_URL, credentialsMap.get("host").toString(), Integer.parseInt(credentialsMap.get("port").toString()));
             JsonNode rootJsonNode = HttpClientUtils.getResponseAsJson(httpClient, url, JsonNode.class);
-            //#TODO take care of the metricPath
             queryMetricsList.addAll(getMetrics(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR +"query", vitalsList, rootJsonNode));
         }
         else{
-            logger.debug("Credentials for getting Query metrics are not specified under the 'query' section");
+            logger.debug("Credentials for getting query metrics are not specified under the 'query' section");
         }
         return queryMetricsList;
     }

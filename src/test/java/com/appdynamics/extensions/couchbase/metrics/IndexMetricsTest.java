@@ -24,13 +24,14 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 
-public class QueryServiceMetricsTest{
+public class IndexMetricsTest{
 
     MonitorConfiguration configuration = mock(MonitorConfiguration.class);
     MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
@@ -39,16 +40,18 @@ public class QueryServiceMetricsTest{
     StatusLine statusLine = mock(StatusLine.class);
     BasicHttpEntity entity;
     Map<String, ?> conf;
+    Map<String, ?> confWithIncludeFalse;
 
     @Before
     public void init() throws IOException{
         conf = YmlReader.readFromFile(new File("src/test/resources/conf/config.yml"));
+        confWithIncludeFalse = YmlReader.readFromFile(new File("src/test/resources/conf/config_WithIncludeFalse.yml"));
         entity = new BasicHttpEntity();
-        entity.setContent(new FileInputStream("src/test/resources/json/Query.json"));
+        entity.setContent(new FileInputStream("src/test/resources/json/Index.json"));
     }
 
     @Test
-    public void clusterAndNodeMetricsTest() throws IOException{
+    public void indexMetricsTest() throws IOException{
         ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
         CountDownLatch latch = new CountDownLatch(1);
 
@@ -60,25 +63,36 @@ public class QueryServiceMetricsTest{
         when(response.getEntity()).thenReturn(entity);
 
         Map<String, ?> metricsMap = (Map<String, ?>)conf.get("metrics");
-        QueryServiceMetrics queryServiceMetrics = new QueryServiceMetrics(configuration, "cluster1", "localhost:8090", metricsMap, latch);
-        queryServiceMetrics.run();
+        IndexMetrics indexMetrics = new IndexMetrics(configuration, "cluster1", "localhost:8090", metricsMap, latch);
+        indexMetrics.run();
+
         verify(metricWriteHelper, times(1)).transformAndPrintNodeLevelMetrics(pathCaptor.capture());
         List<Metric> resultList = pathCaptor.getValue();
         Set<String> metricNames = Sets.newHashSet();
-        metricNames.add("request.completed.count");
-        metricNames.add("request.active.count");
-        metricNames.add("request.per.sec.1min");
-        metricNames.add("request.per.sec.5min");
-        metricNames.add("request.per.sec.15min");
-        metricNames.add("request_time.mean");
-        metricNames.add("request_time.median");
-        metricNames.add("request_time.80percentile");
-        metricNames.add("request_time.95percentile");
-        metricNames.add("request_time.99percentile");
-        metricNames.add("request.prepared.percent");
+        metricNames.add("memorySnapshotInterval");
+        metricNames.add("stableSnapshotInterval");
+        metricNames.add("maxRollbackPoints");
         for(Metric metric : resultList){
             Assert.assertTrue(metricNames.contains(metric.getMetricName()));
         }
-        Assert.assertTrue(resultList.size() == 11);
+        Assert.assertTrue(resultList.size() == 3);
+    }
+
+    @Test
+    public void indexMetricsWithIncludeFalseTest() throws IOException{
+        CountDownLatch latch = new CountDownLatch(1);
+
+        when(configuration.getHttpClient()).thenReturn(httpClient);
+        when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
+        when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
+        when(statusLine.getStatusCode()).thenReturn(200);
+        when(response.getStatusLine()).thenReturn(statusLine);
+        when(response.getEntity()).thenReturn(entity);
+
+        Map<String, ?> metricsMap = (Map<String, ?>)confWithIncludeFalse.get("metrics");
+        IndexMetrics indexMetrics2 = new IndexMetrics(configuration, "cluster1", "localhost:8090", metricsMap, latch);
+        indexMetrics2.run();
+
+        verify(metricWriteHelper, times(0)).transformAndPrintNodeLevelMetrics(anyList());
     }
 }

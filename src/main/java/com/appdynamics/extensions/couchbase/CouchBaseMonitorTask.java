@@ -1,10 +1,16 @@
 package com.appdynamics.extensions.couchbase;
 
 import com.appdynamics.extensions.conf.MonitorConfiguration;
-import com.appdynamics.extensions.couchbase.metrics.*;
+import com.appdynamics.extensions.couchbase.metrics.ClusterAndNodeMetrics;
+import com.appdynamics.extensions.couchbase.metrics.IndexMetrics;
+import com.appdynamics.extensions.couchbase.metrics.QueryServiceMetrics;
+import com.appdynamics.extensions.couchbase.metrics.buckets.BucketMetrics;
+import com.appdynamics.extensions.couchbase.metrics.buckets.BucketMetricsProcessor;
+import com.appdynamics.extensions.couchbase.metrics.xdcr.XDCRMetrics;
 import com.appdynamics.extensions.http.UrlBuilder;
 import com.appdynamics.extensions.util.AssertUtils;
 import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -36,21 +42,22 @@ public class CouchBaseMonitorTask implements Runnable  {
     void populateAndPrintMetrics(){
         Map<String, ?> metricsMap = (Map<String, ?>)configMap.get("metrics");
         CountDownLatch countDownLatch = new CountDownLatch(5);
+        BucketMetricsProcessor bucketMetricsProcessor = new BucketMetricsProcessor();
 
         ClusterAndNodeMetrics clusterAndNodeMetricsTask = new ClusterAndNodeMetrics(configuration, clusterName, serverURL, metricsMap, countDownLatch);
-        configuration.getExecutorService().submit(clusterName + " : Cluster and Node metrics", clusterAndNodeMetricsTask);
+        configuration.getExecutorService().submit(clusterName + " : Cluster and Node json", clusterAndNodeMetricsTask);
 
-        BucketMetrics bucketMetricsTask = new BucketMetrics(configuration, clusterName, serverURL, metricsMap, countDownLatch);
-        configuration.getExecutorService().submit(clusterName + " : Bucket metrics", bucketMetricsTask);
+        BucketMetrics bucketMetricsTask = new BucketMetrics(configuration, clusterName, serverURL, metricsMap, countDownLatch, bucketMetricsProcessor);
+        configuration.getExecutorService().submit(clusterName + " : Bucket json", bucketMetricsTask);
 
         QueryServiceMetrics queryServiceMetricsTask = new QueryServiceMetrics(configuration, clusterName, serverURL, metricsMap, countDownLatch);
-        configuration.getExecutorService().submit(clusterName + " : Query service metrics", queryServiceMetricsTask);
+        configuration.getExecutorService().submit(clusterName + " : Query service json", queryServiceMetricsTask);
 
         XDCRMetrics xdcrMetricsTask = new XDCRMetrics(configuration, clusterName, serverURL, metricsMap, countDownLatch);
-        configuration.getExecutorService().submit(clusterName + " : XDCR metrics", xdcrMetricsTask);
+        configuration.getExecutorService().submit(clusterName + " : xdcr json", xdcrMetricsTask);
 
         IndexMetrics indexMetricsTask = new IndexMetrics(configuration, clusterName, serverURL, metricsMap, countDownLatch);
-        configuration.getExecutorService().submit(clusterName + " : Index metrics", indexMetricsTask);
+        configuration.getExecutorService().submit(clusterName + " : Index json", indexMetricsTask);
 
         try{
             countDownLatch.await();

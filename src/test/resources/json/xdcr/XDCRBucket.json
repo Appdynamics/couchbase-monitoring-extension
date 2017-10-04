@@ -1,0 +1,19 @@
+{
+  "cancelURI": "/controller/cancelXDCR/0222feac39bb82196a59d9b031ec9083%2Fbeer-sample%2Fdefault",
+  "settingsURI": "/settings/replications/0222feac39bb82196a59d9b031ec9083%2Fbeer-sample%2Fdefault",
+  "status": "running",
+  "replicationType": "xmem",
+  "continuous": true,
+  "filterExpression": "",
+  "id": "0222feac39bb82196a59d9b031ec9083/beer-sample/default",
+  "pauseRequested": false,
+  "source": "beer-sample",
+  "target": "/remoteClusters/0222feac39bb82196a59d9b031ec9083/buckets/default",
+  "type": "xdcr",
+  "recommendedRefreshPeriod": 10,
+  "changesLeft": 0,
+  "docsChecked": 7303,
+  "docsWritten": 0,
+  "maxVBReps": null,
+  "errors": []
+}

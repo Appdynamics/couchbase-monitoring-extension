@@ -1,4 +1,4 @@
-package com.appdynamics.extensions.couchbase.metrics;
+package com.appdynamics.extensions.couchbase.metrics.buckets;
 
 import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
@@ -14,16 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-import static com.appdynamics.extensions.couchbase.utils.Constants.INDIVIDUAL_BUCKET_ENDPOINT;
-import static com.appdynamics.extensions.couchbase.utils.Constants.METRIC_SEPARATOR;
-import static com.appdynamics.extensions.couchbase.utils.Constants.getMetricsFromArray;
+import static com.appdynamics.extensions.couchbase.utils.Constants.*;
 
 /**
  * Created by venkata.konala on 9/20/17.
  */
-class IndividualBucketMetrics implements Runnable{
+class OtherBucketMetrics implements Runnable{
 
-    private static final Logger logger = LoggerFactory.getLogger(IndividualBucketMetrics.class);
+    private static final Logger logger = LoggerFactory.getLogger(OtherBucketMetrics.class);
     private MonitorConfiguration configuration;
     private String clusterName;
     private String bucketName;
@@ -33,7 +31,7 @@ class IndividualBucketMetrics implements Runnable{
     private CloseableHttpClient httpClient;
     private MetricWriteHelper metricWriteHelper;
 
-    IndividualBucketMetrics(MonitorConfiguration configuration, String clusterName, String bucketName, String serverURL, Map<String, ?> bucketMap, CountDownLatch latch){
+    OtherBucketMetrics(MonitorConfiguration configuration, String clusterName, String bucketName, String serverURL, Map<String, ?> bucketMap, CountDownLatch latch){
         this.configuration = configuration;
         this.clusterName = clusterName;
         this.bucketName = bucketName;
@@ -58,7 +56,6 @@ class IndividualBucketMetrics implements Runnable{
             JsonNode opJsonNode = rootJsonNode.get("op");
             if (opJsonNode != null) {
                 JsonNode sampleJsonNode = opJsonNode.get("samples");
-                //#TODO take care of the metricPath
                 individualBucketMetricsList.addAll(getMetricsFromArray(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + "buckets" + METRIC_SEPARATOR + bucketName, otherBucketMetricsList, sampleJsonNode));
             }
         }

@@ -9,10 +9,12 @@ import com.google.common.collect.Sets;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+
 import static com.appdynamics.extensions.couchbase.utils.Constants.*;
 
 /**
@@ -55,24 +57,33 @@ public class ClusterAndNodeMetrics implements Runnable {
         JsonNode nodesJsonNode = clusterJsonNode.get("nodes");
         JsonNode storageNode = clusterJsonNode.get("storageTotals");
 
-        Set<String> clusterSectionSet = Sets.newHashSet();
-        clusterSectionSet.add("counters");
-        clusterSectionSet.add("others");
-        //#TODO take care of the metricPath
-        clusterAndNodeMetrics.addAll(getClusterMetrics(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "cluster", clusterMap, clusterJsonNode, clusterSectionSet));
+        if(clusterMap != null && clusterMap.get("include") != null && clusterMap.get("include").toString().equalsIgnoreCase("true")) {
 
-        Set<String> storageSectionSet = Sets.newHashSet();
-        storageSectionSet.add("ram");
-        storageSectionSet.add("hdd");
-        //#TODO take care of the metricPath
-        clusterAndNodeMetrics.addAll(getClusterMetrics(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "cluster", clusterMap, storageNode, storageSectionSet));
+            Set<String> clusterSectionSet = Sets.newHashSet();
+            clusterSectionSet.add("counters");
+            clusterSectionSet.add("others");
+            clusterAndNodeMetrics.addAll(getClusterMetrics(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "cluster", clusterMap, clusterJsonNode, clusterSectionSet));
 
-        Set<String> nodeSectionSet = Sets.newHashSet();
-        nodeSectionSet.add("systemStats");
-        nodeSectionSet.add("interestingStats");
-        nodeSectionSet.add("otherStats");
-        //#TODO take care of the metricPath
-        clusterAndNodeMetrics.addAll(getNodeOrBucketMetrics(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "nodes", nodeMap, nodesJsonNode, nodeSectionSet, nodesSet));
+            Set<String> storageSectionSet = Sets.newHashSet();
+            storageSectionSet.add("ram");
+            storageSectionSet.add("hdd");
+            clusterAndNodeMetrics.addAll(getClusterMetrics(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "cluster", clusterMap, storageNode, storageSectionSet));
+        }
+        else{
+            logger.debug("The metrics in 'cluster' section are not processed either because it is not present (or)'include' parameter is either null or false");
+        }
+
+        if(nodeMap != null && nodeMap.get("include") != null && nodeMap.get("include").toString().equalsIgnoreCase("true")) {
+
+            Set<String> nodeSectionSet = Sets.newHashSet();
+            nodeSectionSet.add("systemStats");
+            nodeSectionSet.add("interestingStats");
+            nodeSectionSet.add("otherStats");
+            clusterAndNodeMetrics.addAll(getNodeOrBucketMetrics(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "nodes", nodeMap, nodesJsonNode, nodeSectionSet, nodesSet));
+        }
+        else{
+            logger.debug("The metrics in 'node' section are not processed either because it is not present (or) 'include' parameter is either null or false");
+        }
 
         return clusterAndNodeMetrics;
     }

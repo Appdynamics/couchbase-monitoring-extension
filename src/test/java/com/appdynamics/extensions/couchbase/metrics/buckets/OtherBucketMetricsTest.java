@@ -1,10 +1,10 @@
-package com.appdynamics.extensions.couchbase.metrics;
+package com.appdynamics.extensions.couchbase.metrics.buckets;
 
 import com.appdynamics.extensions.MetricWriteHelper;
+import com.appdynamics.extensions.MonitorExecutorService;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.yml.YmlReader;
-import com.google.common.collect.Sets;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import static org.mockito.Matchers.any;
@@ -29,12 +28,12 @@ import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-
-public class QueryServiceMetricsTest{
+public class OtherBucketMetricsTest {
 
     MonitorConfiguration configuration = mock(MonitorConfiguration.class);
     MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
     CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
+    MonitorExecutorService executorService = mock(MonitorExecutorService.class);
     CloseableHttpResponse response = mock(CloseableHttpResponse.class);
     StatusLine statusLine = mock(StatusLine.class);
     BasicHttpEntity entity;
@@ -44,41 +43,37 @@ public class QueryServiceMetricsTest{
     public void init() throws IOException{
         conf = YmlReader.readFromFile(new File("src/test/resources/conf/config.yml"));
         entity = new BasicHttpEntity();
-        entity.setContent(new FileInputStream("src/test/resources/json/Query.json"));
+        entity.setContent(new FileInputStream("src/test/resources/json/buckets/IndividualBucket.json"));
     }
 
     @Test
-    public void clusterAndNodeMetricsTest() throws IOException{
-        ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
+    public void overallBucketMetricsTest() throws IOException{
+        ArgumentCaptor<List> listCaptor = ArgumentCaptor.forClass(List.class);
         CountDownLatch latch = new CountDownLatch(1);
 
         when(configuration.getHttpClient()).thenReturn(httpClient);
         when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
+        when(configuration.getExecutorService()).thenReturn(executorService);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(response.getEntity()).thenReturn(entity);
+        when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
 
-        Map<String, ?> metricsMap = (Map<String, ?>)conf.get("metrics");
-        QueryServiceMetrics queryServiceMetrics = new QueryServiceMetrics(configuration, "cluster1", "localhost:8090", metricsMap, latch);
-        queryServiceMetrics.run();
-        verify(metricWriteHelper, times(1)).transformAndPrintNodeLevelMetrics(pathCaptor.capture());
-        List<Metric> resultList = pathCaptor.getValue();
-        Set<String> metricNames = Sets.newHashSet();
-        metricNames.add("request.completed.count");
-        metricNames.add("request.active.count");
-        metricNames.add("request.per.sec.1min");
-        metricNames.add("request.per.sec.5min");
-        metricNames.add("request.per.sec.15min");
-        metricNames.add("request_time.mean");
-        metricNames.add("request_time.median");
-        metricNames.add("request_time.80percentile");
-        metricNames.add("request_time.95percentile");
-        metricNames.add("request_time.99percentile");
-        metricNames.add("request.prepared.percent");
+        Map<String, ?> metricsMap =  (Map<String, ?>)conf.get("metrics");
+        Map<String, ?> bucketMap = (Map<String, ?>) metricsMap.get("buckets");
+        OtherBucketMetrics otherBucketMetrics = new OtherBucketMetrics(configuration, "cluster1", "", "localhost:8090", bucketMap, latch);
+        otherBucketMetrics.run();
+
+        verify(metricWriteHelper, times(1)).transformAndPrintNodeLevelMetrics(listCaptor.capture());
+        List<Metric> resultList = listCaptor.getValue();
         for(Metric metric : resultList){
-            Assert.assertTrue(metricNames.contains(metric.getMetricName()));
+            if(metric.getMetricName().equalsIgnoreCase("bytes_read")){
+                Assert.assertTrue(metric.getMetricValue().equalsIgnoreCase("157.7350859453994"));
+            }
+            if(metric.getMetricName().equalsIgnoreCase("bytes_written")){
+                Assert.assertTrue(metric.getMetricValue().equalsIgnoreCase("377695.652173913"));
+            }
         }
-        Assert.assertTrue(resultList.size() == 11);
     }
 }

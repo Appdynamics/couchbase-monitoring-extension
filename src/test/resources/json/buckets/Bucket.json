@@ -18,15 +18,15 @@
     "couchApiBaseHTTPS": "https://172.17.0.2:18092/beer-sample%2Bf7cb9456069a9253cb5ae9ff47365107",
     "couchApiBase": "http://172.17.0.2:8092/beer-sample%2Bf7cb9456069a9253cb5ae9ff47365107",
     "systemStats": {
-      "cpu_utilization_rate": 8.136482939632545,
+      "cpu_utilization_rate": 5.974025974025974,
       "swap_total": 1073737728,
-      "swap_used": 995438592,
+      "swap_used": 893612032,
       "mem_total": 2095882240,
-      "mem_free": 738979840
+      "mem_free": 427384832
     },
     "interestingStats": {
       "cmd_get": 0,
-      "couch_docs_actual_disk_size": 69963403,
+      "couch_docs_actual_disk_size": 69963423,
       "couch_docs_data_size": 58820608,
       "couch_spatial_data_size": 0,
       "couch_spatial_disk_size": 0,
@@ -36,13 +36,13 @@
       "curr_items_tot": 38894,
       "ep_bg_fetched": 0,
       "get_hits": 0,
-      "mem_used": 125378408,
+      "mem_used": 125378552,
       "ops": 0,
       "vb_replica_curr_items": 0
     },
-    "uptime": "14519",
+    "uptime": "92074",
     "memoryTotal": 2095882240,
-    "memoryFree": 738979840,
+    "memoryFree": 427384832,
     "mcdMemoryReserved": 1599,
     "mcdMemoryAllocated": 1599,
     "replication": 0,
@@ -1117,7 +1117,7 @@
     "opsPerSec": 0,
     "diskFetches": 0,
     "itemCount": 7303,
-    "diskUsed": 36631101,
+    "diskUsed": 36631111,
     "dataUsed": 25508374,
     "memUsed": 44289200
   },
@@ -1145,15 +1145,15 @@
     "couchApiBaseHTTPS": "https://172.17.0.2:18092/default%2B32f097ff3703b638352cf83aa5e606ef",
     "couchApiBase": "http://172.17.0.2:8092/default%2B32f097ff3703b638352cf83aa5e606ef",
     "systemStats": {
-      "cpu_utilization_rate": 8.136482939632545,
+      "cpu_utilization_rate": 5.974025974025974,
       "swap_total": 1073737728,
-      "swap_used": 995438592,
+      "swap_used": 893612032,
       "mem_total": 2095882240,
-      "mem_free": 738979840
+      "mem_free": 427384832
     },
     "interestingStats": {
       "cmd_get": 0,
-      "couch_docs_actual_disk_size": 69963403,
+      "couch_docs_actual_disk_size": 69963423,
       "couch_docs_data_size": 58820608,
       "couch_spatial_data_size": 0,
       "couch_spatial_disk_size": 0,
@@ -1163,13 +1163,13 @@
       "curr_items_tot": 38894,
       "ep_bg_fetched": 0,
       "get_hits": 0,
-      "mem_used": 125378408,
+      "mem_used": 125378552,
       "ops": 0,
       "vb_replica_curr_items": 0
     },
-    "uptime": "14519",
+    "uptime": "92074",
     "memoryTotal": 2095882240,
-    "memoryFree": 738979840,
+    "memoryFree": 427384832,
     "mcdMemoryReserved": 1599,
     "mcdMemoryAllocated": 1599,
     "replication": 0,
@@ -2240,13 +2240,13 @@
     "rawRAM": 209715200
   },
   "basicStats": {
-    "quotaPercentUsed": 38.66634750366211,
+    "quotaPercentUsed": 38.66641616821289,
     "opsPerSec": 0,
     "diskFetches": 0,
     "itemCount": 31591,
-    "diskUsed": 34101860,
+    "diskUsed": 34101870,
     "dataUsed": 34081792,
-    "memUsed": 81089208
+    "memUsed": 81089352
   },
   "evictionPolicy": "valueOnly",
   "conflictResolutionType": "seqno",

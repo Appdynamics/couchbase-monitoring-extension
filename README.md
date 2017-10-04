@@ -5,7 +5,7 @@ This extension works only with the standalone machine agent.
 
 ## Use Case
 
-Couchbase Server is an open source, distributed (shared-nothing architecture) NoSQL document-oriented database that is optimized for interactive applications. This extension allows the user to connect to a specific cluster host and retrieve metrics about the cluster, all the nodes within the cluster and any buckets associated with the nodes.  
+Couchbase Server is an open source, distributed (shared-nothing architecture) NoSQL document-oriented database that is optimized for interactive applications. This extension allows the user to connect to a specific cluster host and retrieve json about the cluster, all the nodes within the cluster and any buckets associated with the nodes.
 
 ## Installation
 
@@ -19,11 +19,11 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
     <argument name="port" is-required="true" default-value="8091">
     <argument name="username" is-required="true" default-value="username">
     <argument name="password" is-required="true" default-value="password">
-    <argument name="disabled-metrics-path" is-required="false" default-value="monitors/CouchBaseMonitor/conf/DisabledMetrics.xml">
+    <argument name="disabled-json-path" is-required="false" default-value="monitors/CouchBaseMonitor/conf/DisabledMetrics.xml">
     <argument name="metric-prefix" is-required="false" default-value="Custom Metrics|Couchbase|">
     
   ```
-5. Open `<MACHINE_AGENT_HOME>/monitors/CouchBaseMonitor/conf/DisabledMetrics.xml` and configure the list of disabled metrics. Here is a sample configuration of the disabled metrics:
+5. Open `<MACHINE_AGENT_HOME>/monitors/CouchBaseMonitor/conf/DisabledMetrics.xml` and configure the list of disabled json. Here is a sample configuration of the disabled json:
   ```
 
     <Metric name="mem_free">
