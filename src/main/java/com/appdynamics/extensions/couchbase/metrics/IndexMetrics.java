@@ -10,12 +10,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-
 import static com.appdynamics.extensions.couchbase.utils.Constants.*;
+import static com.appdynamics.extensions.couchbase.utils.JsonUtils.*;
 
 /**
  * Created by venkata.konala on 9/18/17.
@@ -31,20 +30,20 @@ public class IndexMetrics implements Runnable {
     private CloseableHttpClient httpClient;
     private MetricWriteHelper metricWriteHelper;
 
-    public IndexMetrics(MonitorConfiguration configuration, String clusterName, String serverURL, Map<String, ?> metricsMap, CountDownLatch countDownLatch){
+    public IndexMetrics(MonitorConfiguration configuration, MetricWriteHelper metricWriteHelper, String clusterName, String serverURL, Map<String, ?> metricsMap, CountDownLatch countDownLatch){
         this.configuration = configuration;
+        this.metricWriteHelper = metricWriteHelper;
         this.clusterName = clusterName;
         this.serverURL = serverURL;
         this.indexMap = (Map<String, ?>) metricsMap.get("index");
         this.countDownLatch = countDownLatch;
         this.httpClient = this.configuration.getHttpClient();
-        this.metricWriteHelper = this.configuration.getMetricWriter();
     }
 
     public void run(){
         if(indexMap != null && indexMap.get("include") != null && indexMap.get("include").toString().equalsIgnoreCase("true")) {
             List<Metric> indexMetrics = gatherIndexMetrics();
-            metricWriteHelper.transformAndPrintNodeLevelMetrics(indexMetrics);
+            metricWriteHelper.transformAndPrintMetrics(indexMetrics);
         }
         else{
             logger.debug("The metrics in 'index' section are not processed either because it is not present (or) 'include' parameter is either null or false");

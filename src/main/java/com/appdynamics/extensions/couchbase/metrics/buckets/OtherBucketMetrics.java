@@ -9,12 +9,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-
 import static com.appdynamics.extensions.couchbase.utils.Constants.*;
+import static com.appdynamics.extensions.couchbase.utils.JsonUtils.*;
 
 /**
  * Created by venkata.konala on 9/20/17.
@@ -31,20 +30,20 @@ class OtherBucketMetrics implements Runnable{
     private CloseableHttpClient httpClient;
     private MetricWriteHelper metricWriteHelper;
 
-    OtherBucketMetrics(MonitorConfiguration configuration, String clusterName, String bucketName, String serverURL, Map<String, ?> bucketMap, CountDownLatch latch){
+    OtherBucketMetrics(MonitorConfiguration configuration, MetricWriteHelper metricWriteHelper, String clusterName, String bucketName, String serverURL, Map<String, ?> bucketMap, CountDownLatch latch){
         this.configuration = configuration;
+        this.metricWriteHelper = metricWriteHelper;
         this.clusterName = clusterName;
         this.bucketName = bucketName;
         this.serverURL = serverURL;
         this.bucketMap = bucketMap;
         this.latch = latch;
         this.httpClient = this.configuration.getHttpClient();
-        this.metricWriteHelper = this.configuration.getMetricWriter();
     }
 
     public void run(){
         List<Metric> individualBucketMetricsList = gatherIndividualBucketMetrics();
-        metricWriteHelper.transformAndPrintNodeLevelMetrics(individualBucketMetricsList);
+        metricWriteHelper.transformAndPrintMetrics(individualBucketMetricsList);
         latch.countDown();
     }
 

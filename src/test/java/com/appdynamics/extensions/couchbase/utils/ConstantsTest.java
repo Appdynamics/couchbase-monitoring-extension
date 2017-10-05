@@ -7,14 +7,12 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import static com.appdynamics.extensions.couchbase.utils.Constants.getMetrics;
-import static com.appdynamics.extensions.couchbase.utils.Constants.getMetricsFromArray;
+import static com.appdynamics.extensions.couchbase.utils.JsonUtils.getMetrics;
+import static com.appdynamics.extensions.couchbase.utils.JsonUtils.getMetricsFromArray;
 
 /**
  * Created by venkata.konala on 9/28/17.

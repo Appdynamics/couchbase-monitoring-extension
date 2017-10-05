@@ -48,7 +48,6 @@ public class IndividualXDCRMetricTest {
         conf = YmlReader.readFromFile(new File("src/test/resources/conf/config.yml"));
         entity = new BasicHttpEntity();
         entity.setContent(new FileInputStream("src/test/resources/json/xdcr/bandwidth-usage.json"));
-        //serverURL = "dummy";
     }
 
     @Test
@@ -57,7 +56,7 @@ public class IndividualXDCRMetricTest {
         CountDownLatch latch = new CountDownLatch(1);
 
         when(configuration.getHttpClient()).thenReturn(httpClient);
-        when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
+        //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
         when(configuration.getExecutorService()).thenReturn(executorService);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
@@ -68,10 +67,10 @@ public class IndividualXDCRMetricTest {
         Map<String, ?> xdcrMap = (Map<String, ?>) metricsMap.get("xdcr");
         List<Map<String, ?>> xdcrList = (List<Map<String, ?>>)xdcrMap.get("stats");
         Map<String, ?> bandwidthMetric = (Map<String, ?>)xdcrList.get(0);
-        IndividualXDCRMetric xdcrMetrics = new IndividualXDCRMetric(configuration, "cluster1", "localhost:8090", bandwidthMetric, "0222feac39bb82196a59d9b031ec9083", "beer-sample", "default", latch);
+        IndividualXDCRMetric xdcrMetrics = new IndividualXDCRMetric(configuration, metricWriteHelper, "cluster1", "localhost:8090", bandwidthMetric, "0222feac39bb82196a59d9b031ec9083", "beer-sample", "default", latch);
         xdcrMetrics.run();
 
-        verify(metricWriteHelper, times(1)).transformAndPrintNodeLevelMetrics(pathCaptor.capture());
+        verify(metricWriteHelper, times(1)).transformAndPrintMetrics(pathCaptor.capture());
         List<Metric> resultList = pathCaptor.getValue();
         Set<String> metricNames = Sets.newHashSet();
         metricNames.add("bandwidth_usage");

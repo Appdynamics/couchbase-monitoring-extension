@@ -8,7 +8,6 @@ import com.google.common.collect.Sets;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,14 +32,14 @@ public class XDCRMetrics implements Runnable{
     private MonitorExecutorService executorService;
     private Set<JsonNode> xdcrBucketsSet;
 
-    public XDCRMetrics(MonitorConfiguration configuration, String clusterName, String serverURL, Map<String, ?> metricsMap, CountDownLatch countDownLatch){
+    public XDCRMetrics(MonitorConfiguration configuration, MetricWriteHelper metricWriteHelper, String clusterName, String serverURL, Map<String, ?> metricsMap, CountDownLatch countDownLatch){
         this.configuration = configuration;
+        this.metricWriteHelper = metricWriteHelper;
         this.clusterName = clusterName;
         this.serverURL = serverURL;
         this.xdcrMap = (Map<String, ?>) metricsMap.get("xdcr");
         this.countDownLatch = countDownLatch;
         this.httpClient = this.configuration.getHttpClient();
-        this.metricWriteHelper = this.configuration.getMetricWriter();
         this.executorService = this.configuration.getExecutorService();
         this.xdcrBucketsSet = Sets.newHashSet();
     }
@@ -71,7 +70,7 @@ public class XDCRMetrics implements Runnable{
     private void getIndividualBucketXDCRMetrics(List<Map<String, ?>> xdcrMetricsList){
         CountDownLatch latch = new CountDownLatch(xdcrBucketsSet.size());
         for(JsonNode xdcrBucketNode : xdcrBucketsSet) {
-            IndividualXDCRBuckets individualXDCRBucketsTask = new IndividualXDCRBuckets(configuration, clusterName, serverURL, xdcrBucketNode, xdcrMetricsList, latch);
+            IndividualXDCRBuckets individualXDCRBucketsTask = new IndividualXDCRBuckets(configuration, metricWriteHelper, clusterName, serverURL, xdcrBucketNode, xdcrMetricsList, latch);
             executorService.submit(xdcrBucketNode.get("id").asText(), individualXDCRBucketsTask);
         }
         try {

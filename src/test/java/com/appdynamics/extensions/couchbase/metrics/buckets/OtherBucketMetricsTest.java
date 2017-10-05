@@ -52,20 +52,19 @@ public class OtherBucketMetricsTest {
         CountDownLatch latch = new CountDownLatch(1);
 
         when(configuration.getHttpClient()).thenReturn(httpClient);
-        when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
+        //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
         when(configuration.getExecutorService()).thenReturn(executorService);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(response.getEntity()).thenReturn(entity);
-        when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
 
         Map<String, ?> metricsMap =  (Map<String, ?>)conf.get("metrics");
         Map<String, ?> bucketMap = (Map<String, ?>) metricsMap.get("buckets");
-        OtherBucketMetrics otherBucketMetrics = new OtherBucketMetrics(configuration, "cluster1", "", "localhost:8090", bucketMap, latch);
+        OtherBucketMetrics otherBucketMetrics = new OtherBucketMetrics(configuration, metricWriteHelper, "cluster1", "", "localhost:8090", bucketMap, latch);
         otherBucketMetrics.run();
 
-        verify(metricWriteHelper, times(1)).transformAndPrintNodeLevelMetrics(listCaptor.capture());
+        verify(metricWriteHelper, times(1)).transformAndPrintMetrics(listCaptor.capture());
         List<Metric> resultList = listCaptor.getValue();
         for(Metric metric : resultList){
             if(metric.getMetricName().equalsIgnoreCase("bytes_read")){

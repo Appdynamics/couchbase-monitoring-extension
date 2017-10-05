@@ -8,7 +8,6 @@ import com.google.common.collect.Lists;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.LoggerFactory;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -35,8 +34,9 @@ public class IndividualXDCRMetric implements Runnable{
     private MetricWriteHelper metricWriteHelper;
     private List<Metric> xdcrMetricList;
 
-    IndividualXDCRMetric(MonitorConfiguration configuration, String clusterName, String serverURL, Map<String, ?> metric, String remote_uuid, String bucketName, String destinationName, CountDownLatch latch){
+    IndividualXDCRMetric(MonitorConfiguration configuration, MetricWriteHelper metricWriteHelper, String clusterName, String serverURL, Map<String, ?> metric, String remote_uuid, String bucketName, String destinationName, CountDownLatch latch){
         this.configuration = configuration;
+        this.metricWriteHelper = metricWriteHelper;
         this.clusterName = clusterName;
         this.serverURL = serverURL;
         this.metric = metric;
@@ -45,13 +45,12 @@ public class IndividualXDCRMetric implements Runnable{
         this.destinationName = destinationName;
         this.latch = latch;
         this.httpClient = this.configuration.getHttpClient();
-        this.metricWriteHelper = this.configuration.getMetricWriter();
         this.xdcrMetricList = Lists.newArrayList();
     }
 
     public void run(){
         gatherAndPrintXDCRMetric();
-        metricWriteHelper.transformAndPrintNodeLevelMetrics(xdcrMetricList);
+        metricWriteHelper.transformAndPrintMetrics(xdcrMetricList);
         latch.countDown();
     }
 

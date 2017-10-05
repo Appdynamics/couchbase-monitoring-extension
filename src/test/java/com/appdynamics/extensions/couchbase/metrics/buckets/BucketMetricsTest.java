@@ -56,21 +56,21 @@ public class BucketMetricsTest {
         ArgumentCaptor<List> listCaptor = ArgumentCaptor.forClass(List.class);
 
         when(configuration.getHttpClient()).thenReturn(httpClient);
-        when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
+        //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
         when(configuration.getExecutorService()).thenReturn(executorService);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(response.getEntity()).thenReturn(entity);
-        when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
-        doNothing().when(bucketMetricsProcessor).getIndividualBucketMetrics(eq(configuration), eq("cluster1"), eq("localhost:8090"), anyMap(), anySet());
+        //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
+        doNothing().when(bucketMetricsProcessor).getIndividualBucketMetrics(eq(configuration), eq(metricWriteHelper), eq("cluster1"), eq("localhost:8090"), anyMap(), anySet());
 
         Map<String, ?> metricsMap =  (Map<String, ?>)conf.get("metrics");
         CountDownLatch latch = new CountDownLatch(1);
-        BucketMetrics bucketMetrics = new BucketMetrics(configuration, "cluster1", "localhost:8090",  metricsMap, latch, bucketMetricsProcessor);
+        BucketMetrics bucketMetrics = new BucketMetrics(configuration, metricWriteHelper, "cluster1", "localhost:8090",  metricsMap, latch, bucketMetricsProcessor);
         bucketMetrics.run();
 
-        verify(metricWriteHelper, times(1)).transformAndPrintNodeLevelMetrics(listCaptor.capture());
+        verify(metricWriteHelper, times(1)).transformAndPrintMetrics(listCaptor.capture());
         Set<String> metricSet = Sets.newHashSet();
         metricSet.add("ram");
         metricSet.add("rawRAM");

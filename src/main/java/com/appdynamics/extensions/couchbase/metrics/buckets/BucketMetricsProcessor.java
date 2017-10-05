@@ -1,5 +1,6 @@
 package com.appdynamics.extensions.couchbase.metrics.buckets;
 
+import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
 import com.appdynamics.extensions.http.HttpClientUtils;
 import com.appdynamics.extensions.metrics.Metric;
@@ -9,13 +10,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-
 import static com.appdynamics.extensions.couchbase.utils.Constants.*;
+import static com.appdynamics.extensions.couchbase.utils.JsonUtils.*;
 
 /**
  * Created by venkata.konala on 10/4/17.
@@ -34,10 +34,10 @@ public class BucketMetricsProcessor {
         return bucketMetrics;
      }
 
-     void getIndividualBucketMetrics(MonitorConfiguration configuration, String clusterName, String serverURL, Map<String, ?> bucketMap, Set<String> bucketsSet){
+     void getIndividualBucketMetrics(MonitorConfiguration configuration, MetricWriteHelper metricWriteHelper, String clusterName, String serverURL, Map<String, ?> bucketMap, Set<String> bucketsSet){
         CountDownLatch latch = new CountDownLatch(bucketsSet.size());
         for(String bucket : bucketsSet){
-            OtherBucketMetrics otherBucketMetricsTask = new OtherBucketMetrics(configuration, clusterName, bucket, String.format(serverURL + INDIVIDUAL_BUCKET_ENDPOINT, bucket), bucketMap, latch);
+            OtherBucketMetrics otherBucketMetricsTask = new OtherBucketMetrics(configuration, metricWriteHelper, clusterName, bucket, String.format(serverURL + INDIVIDUAL_BUCKET_ENDPOINT, bucket), bucketMap, latch);
             configuration.getExecutorService().submit("Extra Bucket task " + bucket, otherBucketMetricsTask);
         }
         try{

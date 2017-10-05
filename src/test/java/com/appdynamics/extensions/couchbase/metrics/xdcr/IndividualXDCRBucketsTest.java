@@ -59,7 +59,7 @@ public class IndividualXDCRBucketsTest {
         CountDownLatch latch = new CountDownLatch(1);
 
         when(configuration.getHttpClient()).thenReturn(httpClient);
-        when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
+        //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
         when(configuration.getExecutorService()).thenReturn(executorService);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
@@ -68,10 +68,10 @@ public class IndividualXDCRBucketsTest {
 
         List<Map<String, ?>> xdcrList = Lists.newArrayList();
         ObjectMapper mapper = new ObjectMapper();
-        IndividualXDCRBuckets xdcrMetrics = new IndividualXDCRBuckets(configuration, "cluster1", "localhost:8090",  mapper.readValue(entity.getContent(), JsonNode.class),xdcrList, latch);
+        IndividualXDCRBuckets xdcrMetrics = new IndividualXDCRBuckets(configuration, metricWriteHelper, "cluster1", "localhost:8090",  mapper.readValue(entity.getContent(), JsonNode.class),xdcrList, latch);
         xdcrMetrics.run();
 
-        verify(metricWriteHelper, times(1)).transformAndPrintNodeLevelMetrics(pathCaptor.capture());
+        verify(metricWriteHelper, times(1)).transformAndPrintMetrics(pathCaptor.capture());
         List<Metric> resultList = pathCaptor.getValue();
         Set<String> metricNames = Sets.newHashSet();
         metricNames.add("status");

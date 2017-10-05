@@ -53,16 +53,16 @@ public class QueryServiceMetricsTest{
         CountDownLatch latch = new CountDownLatch(1);
 
         when(configuration.getHttpClient()).thenReturn(httpClient);
-        when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
+        //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(response.getEntity()).thenReturn(entity);
 
         Map<String, ?> metricsMap = (Map<String, ?>)conf.get("metrics");
-        QueryServiceMetrics queryServiceMetrics = new QueryServiceMetrics(configuration, "cluster1", "localhost:8090", metricsMap, latch);
+        QueryServiceMetrics queryServiceMetrics = new QueryServiceMetrics(configuration, metricWriteHelper, "cluster1", "localhost:8090", metricsMap, latch);
         queryServiceMetrics.run();
-        verify(metricWriteHelper, times(1)).transformAndPrintNodeLevelMetrics(pathCaptor.capture());
+        verify(metricWriteHelper, times(1)).transformAndPrintMetrics(pathCaptor.capture());
         List<Metric> resultList = pathCaptor.getValue();
         Set<String> metricNames = Sets.newHashSet();
         metricNames.add("request.completed.count");

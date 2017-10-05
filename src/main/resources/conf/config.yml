@@ -1,7 +1,7 @@
 #This will populate the json in all the tiers, under this path(not recommended)
 #metricPrefix: "Custom json|CouchBase"
 #The following prefix will populate the json under one tier
-metricPrefix: "Server|Component:AppLevels|Custom json|CouchBase"
+metricPrefix: "Server|Component:AppLevels|Custom Metrics|CouchBase"
 
 #Add your list of CouchBase clusters here.
 servers:

@@ -1,14 +1,12 @@
 package com.appdynamics.extensions.couchbase;
 
 import com.appdynamics.extensions.ABaseMonitor;
-import com.appdynamics.extensions.ATaskExecutor;
+import com.appdynamics.extensions.AMonitorRunContext;
 import com.appdynamics.extensions.util.AssertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Map;
-
 import static com.appdynamics.extensions.couchbase.utils.Constants.DEFAULT_METRIC_PREFIX;
 
 public class CouchBaseMonitor extends ABaseMonitor {
@@ -21,16 +19,16 @@ public class CouchBaseMonitor extends ABaseMonitor {
     }
 
     @Override
-    protected String getMonitorName() {
+    public String getMonitorName() {
         return "CouchBase Monitor";
     }
 
     @Override
-    protected void doRun(ATaskExecutor taskExecutor) {
+    protected void doRun(AMonitorRunContext taskExecutor) {
         List<Map<String,String>> servers = (List<Map<String,String>>)configuration.getConfigYml().get("servers");
         AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
         for (Map<String, String> server : servers) {
-            CouchBaseMonitorTask task = new CouchBaseMonitorTask(configuration, server);
+            CouchBaseMonitorTask task = new CouchBaseMonitorTask(configuration, taskExecutor.getMetricWriteHelper(), server);
             taskExecutor.submit(server.get("name"),task);
         }
     }

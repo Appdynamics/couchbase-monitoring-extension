@@ -9,11 +9,9 @@ import com.google.common.collect.Lists;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-
 import static com.appdynamics.extensions.couchbase.utils.Constants.METRIC_SEPARATOR;
 
 /**
@@ -32,8 +30,9 @@ public class IndividualXDCRBuckets implements Runnable {
     private MetricWriteHelper metricWriteHelper;
     private MonitorExecutorService executorService;
 
-    IndividualXDCRBuckets(MonitorConfiguration configuration, String clusterName, String serverURL, JsonNode xdcrBucketNode, List<Map<String, ?>> xdcrMetricsList, CountDownLatch countDownLatch){
+    IndividualXDCRBuckets(MonitorConfiguration configuration, MetricWriteHelper metricWriteHelper, String clusterName, String serverURL, JsonNode xdcrBucketNode, List<Map<String, ?>> xdcrMetricsList, CountDownLatch countDownLatch){
         this.configuration = configuration;
+        this.metricWriteHelper = metricWriteHelper;
         this.clusterName = clusterName;
         this.serverURl = serverURL;
         this.xdcrBucketNode = xdcrBucketNode;
@@ -41,7 +40,6 @@ public class IndividualXDCRBuckets implements Runnable {
         this.xdcrMetricsList = xdcrMetricsList;
         this.countDownLatch = countDownLatch;
         this.httpClient = this.configuration.getHttpClient();
-        this.metricWriteHelper = this.configuration.getMetricWriter();
         this.executorService = this.configuration.getExecutorService();
     }
 
@@ -64,7 +62,7 @@ public class IndividualXDCRBuckets implements Runnable {
 
         CountDownLatch latch = new CountDownLatch(xdcrMetricsList.size());
         for (Map<String, ?> metric : xdcrMetricsList) {
-            IndividualXDCRMetric individualXDCRMetricTask = new IndividualXDCRMetric(configuration, clusterName, serverURl, metric, remote_uuid, bucketName, destinationName,latch);
+            IndividualXDCRMetric individualXDCRMetricTask = new IndividualXDCRMetric(configuration, metricWriteHelper, clusterName, serverURl, metric, remote_uuid, bucketName, destinationName,latch);
             executorService.submit(id + " " + metric.entrySet().iterator().next().getKey(), individualXDCRMetricTask);
         }
         try {
@@ -74,7 +72,7 @@ public class IndividualXDCRBuckets implements Runnable {
             logger.debug(ie.getMessage());
         }
         finally {
-            metricWriteHelper.transformAndPrintNodeLevelMetrics(xdcrStatusMetrics);
+            metricWriteHelper.transformAndPrintMetrics(xdcrStatusMetrics);
         }
     }
 }

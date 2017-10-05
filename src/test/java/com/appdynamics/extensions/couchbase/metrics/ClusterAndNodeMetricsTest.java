@@ -57,17 +57,16 @@ public class ClusterAndNodeMetricsTest{
         CountDownLatch latch = new CountDownLatch(1);
 
         when(configuration.getHttpClient()).thenReturn(httpClient);
-        when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(response.getEntity()).thenReturn(entity);
 
         Map<String, ?> metricsMap = (Map<String, ?>)conf.get("metrics");
-        ClusterAndNodeMetrics clusterAndNodeMetrics = new ClusterAndNodeMetrics(configuration, "cluster1", "localhost:8090", metricsMap, latch);
+        ClusterAndNodeMetrics clusterAndNodeMetrics = new ClusterAndNodeMetrics(configuration, metricWriteHelper,"cluster1", "localhost:8090", metricsMap, latch);
         clusterAndNodeMetrics.run();
 
-        verify(metricWriteHelper, times(1)).transformAndPrintNodeLevelMetrics(pathCaptor.capture());
+        verify(metricWriteHelper, times(1)).transformAndPrintMetrics(pathCaptor.capture());
 
         List<Metric> resultList = pathCaptor.getValue();
         Set<String> metricNames = Sets.newHashSet();
