@@ -77,7 +77,7 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
      ```
      **All these metric properties are optional, and the default value shown in the table is applied to the metric(if a property has not been specified) by default.**
      
-     There are five categories of metrics i.e cluster, node , bucket, query, xdcr. To disable any of these sections, change the include parameter under the section to "false" as follows:
+     There are five categories of metrics i.e cluster, node , bucket, query, xdcr, index. To disable any of these sections, change the include parameter under the section to "false" as follows:
      ```
      index:
         include: "false"
@@ -143,6 +143,28 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
 |itemCount       		|Number of items associated with the bucket
 |diskUsed       		|Amount of disk used (bytes)
 |quotaPercentUsed       	|Percentage of RAM used (for active objects) against the configure bucket size.(%)
+
+### Metric Category: XDCR Metrics
+|Metric Name            	|Description|
+|------------------------------	|-----------|
+|bandwidth_usage        		|Bandwidth used during replication, measured in bytes per second
+|changes_left  			|Number of updates still pending replication
+|data_replicated         		|Size of data replicated in bytes
+|docs_checked         			|Number of documents checked for changes
+|docs_failed_cr_source	        	|Number of documents that have failed conflict resolution on the source cluster and not replicated to target cluster
+|docs_filtered       			|Number of documents that have been filtered out and not replicated to target cluster
+|docs_latency_wt       		|Weighted average latency for sending replicated changes to destination cluster
+|docs_opt_repd       		|Number of docs sent optimistically
+|docs_received_from_dcp       	|Number of documents received from DCP
+|docs_rep_queue                 |Number of documents in replication queue
+|docs_written                   |Number of documents written to the destination cluster via xdcr
+|meta_latency_wt                |Weighted average time for requesting document metadata. xdcr uses this for conflict resolution prior to sending the document into the replication queue.
+|num_checkpoints                |Number of checkpoints issued in replication queue.
+|num_failedckpts                |Number of checkpoints failed during replication.
+|rate_received_from_dcp         |Number of documents received from DCP per second.
+|rate_replication               |Rate of documents being replicated, measured in documents per second.
+|size_rep_queue                 |Size of replication queue in bytes.
+|time_committing                |Seconds elapsed during replication.
 
 ## Version
 2.0.0  -  Revamped the extension to support new extensions framework(2.0.0), Added 3 different categories of metrics(query, index and xdcr), Added extra metrics in cluster, node and bucket categories.
