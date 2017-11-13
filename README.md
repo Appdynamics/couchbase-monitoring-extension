@@ -1,63 +1,85 @@
-CouchBase Monitoring Extension
-============================
-
-This extension works only with the standalone machine agent.
+# CouchBase Monitoring Extension for AppDynamics
 
 ## Use Case
+Couchbase Server is an open source, distributed (shared-nothing architecture) NoSQL document-oriented database that is optimized for interactive applications. This extension allows the user to connect to a specific cluster host and retrieve metrics about the cluster, all the nodes within the cluster and any buckets associated with the nodes.
 
-Couchbase Server is an open source, distributed (shared-nothing architecture) NoSQL document-oriented database that is optimized for interactive applications. This extension allows the user to connect to a specific cluster host and retrieve json about the cluster, all the nodes within the cluster and any buckets associated with the nodes.
+## Prerequisites
+1. This extension works only with the standalone Java machine agent. The extension requires the machine agent to be up and running.
+2. This extension creates a client to the CouchBase server that needs to be monitored. So the CouchBase server that has to be monitored, should be available for access from the machine that has the extension installed.
 
 ## Installation
+1. Unzip the contents of "CouchBaseMonitor.zip" as "CouchBaseMonitor" and copy the "CouchBaseMonitor" directory to `<MACHINE_AGENT_HOME>/monitors/`
 
-1. Run 'mvn clean install' in the command line from the couchbase-monitoring-extension directory.
-2. Deploy the file CouchBaseMonitor.zip found in the 'target' directory into `<MACHINE_AGENT_HOME>/monitors/` directory.
-3. Unzip the deployed file.
-4. Open `<MACHINE_AGENT_HOME>/monitors/CouchBaseMonitor/monitor.xml` and configure the CouchBase parameters.
-  ```
+## Recommendations
+It is recommended that a single CouchBase monitoring extension be used to monitor a single CouchBase cluster.
 
-    <argument name="host" is-required="true" default-value="localhost">
-    <argument name="port" is-required="true" default-value="8091">
-    <argument name="username" is-required="true" default-value="username">
-    <argument name="password" is-required="true" default-value="password">
-    <argument name="disabled-json-path" is-required="false" default-value="monitors/CouchBaseMonitor/conf/DisabledMetrics.xml">
-    <argument name="metric-prefix" is-required="false" default-value="Custom Metrics|Couchbase|">
-    
-  ```
-5. Open `<MACHINE_AGENT_HOME>/monitors/CouchBaseMonitor/conf/DisabledMetrics.xml` and configure the list of disabled json. Here is a sample configuration of the disabled json:
-  ```
+## Configuring the extension using config.yml
+Configure the CouchBase monitoring extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/CouchBaseMonitor/`
 
-    <Metric name="mem_free">
-    <Metric name="mem_total">
-    
-  ```
-6. Restart the machine agent.
+  1. Configure the "tier" under which the metrics need to be reported. This can be done by changing the value of `<TIER NAME OR TIER ID>` in
+     metricPrefix: "Server|Component:`<TIER NAME OR TIER ID>`|Custom Metrics|CouchBase".
 
-In the AppDynamics Metric Browser, look for: Application Infrastructure Performance | &lt;Tier&gt; | Custom Metrics | CouchBase
+     For example,
+     ```
+     metricPrefix: "Server|Component:Extensions tier|Custom Metrics|CouchBase"
+     ```
 
-## Directory Structure
+  2. Configure the CouchBase cluster by specifying the name(required), host(required), port(required), queryPort(required) of  any node(server) in the CouchBase cluster, username(only if authentication enabled), password(only if authentication enabled), passwordEncrypted(only if password encryption required).
 
-| Directory/File | Description |
-|----------------|-------------|
-|src/main/resources/conf            | Contains the monitor.xml, DisabledMetrics.xml |
-|src/main/java             | Contains source code of the CouchBase monitoring extension |
-|target            | Only obtained when using maven. Run 'mvn clean install' to get the distributable .zip file |
-|pom.xml       | Maven build script to package the project (required only if changing Java code) |
+     For example,
+     ```
+      servers:
+        - name: "Cluster1"
+          host: "localhost"
+          port: "8091"
+          queryPort: "8093"
+          username: "Administrator"
+          password: "password1"
+          passwordEncrypted: ""
+     ```
 
-##Password Encryption Support
+  3. Configure the encyptionKey for passwordEncrypted(only if password encryption required).
 
-To avoid setting the clear text password in the monitor.xml. Please follow the process to encrypt the password and set the encrypted password and the key in the monitor.xml 
-1. Download the util jar to encrypt the password from https://github.com/Appdynamics/maven-repo/raw/master/releases/com/appdynamics/appd-exts-commons/1.1.2/appd-exts-commons-1.1.2.jar 
-2. Encrypt password from the commandline 
-java -cp "appd-exts-commons-1.1.2.jar" com.appdynamics.extensions.crypto.Encryptor myKey myPassword 
-3. Add the properties in the monitor.xml. Substitute the default-value 
-<argument name="password-encrypted" is-required="true" default-value="<ENCRYPTED_PASSWORD>"/> 
-<argument name="encryption-key" is-required="false" default-value="myKey"/>
+     For example,
+     ```
+     #Encryption key for Encrypted password.
+     encryptionKey: "axcdde43535hdhdgfiniyy576"
+     ```
+     
+  4. Configure the metrics section.
 
+     For configuring the metrics, the following properties can be used:
 
+     |     Property      |   Default value |         Possible values         |                                              Description                                                                                                |
+     | :---------------- | :-------------- | :------------------------------ | :------------------------------------------------------------------------------------------------------------- |
+     | alias             | metric name     | Any string                      | The substitute name to be used in the metric browser instead of metric name.                                   |
+     | aggregationType   | "AVERAGE"       | "AVERAGE", "SUM", "OBSERVATION" | [Aggregation qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)    |
+     | timeRollUpType    | "AVERAGE"       | "AVERAGE", "SUM", "CURRENT"     | [Time roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)   |
+     | clusterRollUpType | "INDIVIDUAL"    | "INDIVIDUAL", "COLLECTIVE"      | [Cluster roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)|
+     | multiplier        | 1               | Any number                      | Value with which the metric needs to be multiplied.                                                            |
+     | convert           | null            | Any key value map               | Set of key value pairs that indicates the value to which the metrics need to be transformed. eg: UP:0, DOWN:1  |
+     | delta             | false           | true, false                     | If enabled, gives the delta values of metrics instead of actual values.                                        |
+
+     For example,
+     ```
+     - bandwidth_usage:  #Bandwidth used during replication, measured in bytes per second.
+         alias: "bandwidthUsed"
+         multiplier: 1
+         aggregationType: "SUM"
+         timeRollUpType: "CURRENT"
+         clusterRollUpType: "INDIVIDUAL"
+         delta: true
+     - status:
+         alias: "status"
+         convert:
+           "healthy" : 1
+           "warmup" : 2
+     ```
+     **All these metric properties are optional, and the default value shown in the table is applied to the metric(if a property has not been specified) by default.**
+     
 ## Metrics
 
 ### Metric Category: Cluster Metrics
-
 |Metric Name            	|Description|
 |------------------------------	|------------|
 |ram_total        		|Total ram available to cluster (bytes)
@@ -72,7 +94,6 @@ java -cp "appd-exts-commons-1.1.2.jar" com.appdynamics.extensions.crypto.Encrypt
 |hdd_free       		|Free harddrive space in the cluster (bytes)
 
 ### Metric Category: Node Metrics
-
 |Metric Name            	|Description|
 |------------------------------	|-----------|
 |memoryFree        		|Amount of memory free for the node (bytes)
@@ -98,7 +119,6 @@ java -cp "appd-exts-commons-1.1.2.jar" com.appdynamics.extensions.crypto.Encrypt
 |ops       			|Number of operations performed on Couchbase
 
 ### Metric Category: Bucket Metrics
-
 |Metric Name            	|Description|
 |------------------------------	|-----------|
 |opsPerSec        		|Number of operations per second
@@ -111,20 +131,18 @@ java -cp "appd-exts-commons-1.1.2.jar" com.appdynamics.extensions.crypto.Encrypt
 |diskUsed       		|Amount of disk used (bytes)
 |quotaPercentUsed       	|Percentage of RAM used (for active objects) against the configure bucket size.(%)
 
+## Version
+2.0.0  -  Revamped the extension to support new extensions framework(2.0.0), Added 3 different categories of metrics(query, index and xdcr), Added extra metrics in cluster, node and bucket categories.
 
-## Custom Dashboard
+## Troubleshooting
+Please follow the steps specified in the [TROUBLESHOOTING](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) document to debug problems faced while using the extension.
 
-![](https://raw.github.com/Appdynamics/couchbase-monitoring-extension/master/CouchBase%20Dashboard.png)
+## Contributing
 
-##Contributing
+Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/couchbase-monitoring-extension).
 
-Always feel free to fork and contribute any changes directly here on GitHub.
+## Community
+Find out more in the [AppSphere](https://www.appdynamics.com/community/exchange/extension/couchbase-monitoring-extension/) community.
 
-##Community
-
-Find out more in the [AppSphere](http://appsphere.appdynamics.com/t5/eXchange/CouchBase---Monitoring-Extension/idi-p/5567) community.
-
-##Support
-
-For any questions or feature request, please contact [AppDynamics Center of Excellence](mailto:ace-request@appdynamics.com).
-
+## Support
+For any questions or feature request, please contact [AppDynamics Support](mailto:help@appdynamics.com).
