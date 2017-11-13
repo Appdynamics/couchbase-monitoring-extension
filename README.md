@@ -77,6 +77,19 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
      ```
      **All these metric properties are optional, and the default value shown in the table is applied to the metric(if a property has not been specified) by default.**
      
+     There are five categories of metrics i.e cluster, node , bucket, query, xdcr. To disable any of these sections, change the include parameter under the section to "false" as follows:
+     ```
+     index:
+        include: "false"
+        stats:
+            - memorySnapshotInterval:
+                  alias: "memorySnapshotInterval"
+            - stableSnapshotInterval:
+                  alias: "stableSnapshotInterval"
+            - maxRollbackPoints:
+                  alias: "maxRollbackPoints"
+     ```
+     
 ## Metrics
 
 ### Metric Category: Cluster Metrics
