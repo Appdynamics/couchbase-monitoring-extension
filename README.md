@@ -92,7 +92,7 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
      
 ## Metrics
 
-### Metric Category: Cluster Metrics
+### Metric Category: cluster Metrics
 |Metric Name            	|Description|
 |------------------------------	|------------|
 |ram_total        		|Total ram available to cluster (bytes)
@@ -106,7 +106,7 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
 |hdd_quotaTotal       		|Harddrive quota total for the cluster (bytes)
 |hdd_free       		|Free harddrive space in the cluster (bytes)
 
-### Metric Category: Node Metrics
+### Metric Category: nodes Metrics
 |Metric Name            	|Description|
 |------------------------------	|-----------|
 |memoryFree        		|Amount of memory free for the node (bytes)
@@ -131,7 +131,7 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
 |swap_total       		|Total swap size allocated (bytes)
 |ops       			|Number of operations performed on Couchbase
 
-### Metric Category: Bucket Metrics
+### Metric Category: buckets Metrics
 |Metric Name            	|Description|
 |------------------------------	|-----------|
 |opsPerSec        		|Number of operations per second
@@ -144,7 +144,23 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
 |diskUsed       		|Amount of disk used (bytes)
 |quotaPercentUsed       	|Percentage of RAM used (for active objects) against the configure bucket size.(%)
 
-### Metric Category: XDCR Metrics
+### Metric Category: query Metrics
+|           Metric Name           |                      Description                               |
+|---------------------------------|----------------------------------------------------------------|
+|request.completed.count        	|Bandwidth used during replication, measured in bytes per second
+|request.active.count  			      |Number of updates still pending replication
+|request.per.sec.1min         		|Size of data replicated in bytes
+|request.per.sec.5min             |
+|request.per.sec.15min            |
+|request_time.mean                |
+|request_time.median              |
+|request_time.80percentile        |
+|request_time.95percentile        |
+|request_time.99percentile        |
+|request.prepared.percent         |
+
+
+### Metric Category: xdcr Metrics
 |Metric Name            	|Description|
 |------------------------------	|-----------|
 |bandwidth_usage        		|Bandwidth used during replication, measured in bytes per second
@@ -166,8 +182,22 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
 |size_rep_queue                 |Size of replication queue in bytes.
 |time_committing                |Seconds elapsed during replication.
 
+### Metric Category: index Metrics
+|Metric Name            	|Description|
+|------------------------------	|-----------|
+|memorySnapshotInterval        		|How often the indexer creates an in-memory snapshot for querying
+|stableSnapshotInterval  			|How often the indexer creates a persistent snapshot of recovery
+|maxRollbackPoints         		|Maximum number of rollback points
+
 ## Version
-2.0.0  -  Revamped the extension to support new extensions framework(2.0.0), Added 3 different categories of metrics(query, index and xdcr), Added extra metrics in cluster, node and bucket categories.
+
+|                              |           |      
+|------------------------------|-----------|
+|Current version               |2.0.0      |
+|CouchBase version tested on   |4.6        |
+|Last Update                   |11/13/2017 |
+
+2.0.0  -  Revamped the extension to support new extensions framework(2.0.0), Added 3 different categories of metrics(query, xdcr and index), Added extra metrics in cluster, node and bucket categories.
 
 ## Troubleshooting
 Please follow the steps specified in the [TROUBLESHOOTING](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) document to debug problems faced while using the extension.
