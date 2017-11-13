@@ -1,0 +1,285 @@
+#This will populate the Metrics in all the tiers, under this path(not recommended)
+#metricPrefix: "Custom Metrics|CouchBase"
+#The following prefix will populate the Metrics under one tier
+metricPrefix: "Server|Component:<TIER ID OR TIER NAME>|Custom Metrics|CouchBase"
+
+#Add your CouchBase cluster here.
+#A CouchBase cluster can have a single node or
+#multiple nodes. Connecting to any CouchBase node in the cluster
+#gives metric data starting from bucket level to cluster level. So
+#the credentials for any node in the CouchBase cluster that needs to be monitored
+#is required here.
+servers:
+  - name: "Cluster1"
+    host: "localhost"
+    port: "8091"
+    queryPort: "8093"
+    username: "Administrator"
+    password: "password1"
+    passwordEncrypted: ""
+
+#Encryption key for Encrypted password.
+encryptionKey: ""
+
+numberOfThreads: 50
+
+metrics:
+    cluster:
+        include: "true"
+        ram:
+            - total:
+                  alias: "total"
+            - quotaTotal:
+                  alias: "quotaTotal"
+            - quotaUsed:
+                  alias: "quotaUsed"
+            - used:
+                  alias: "used"
+            - usedByData:
+                  alias: "usedByData"
+            - quotaUsedPerNode:
+                  alias: "quotaUsedPerNode"
+            - quotaTotalPerNode:
+                  alias: "quotaTotalPerNode"
+        hdd:
+            - total:
+                  alias: "total"
+            - quotaTotal:
+                  alias: "quotaTotal"
+            - used:
+                  alias: "used"
+            - usedByData:
+                  alias: "usedByData"
+            - free:
+                  alias: "free"
+        counters:
+            - rebalance_success:
+                  alias: "rebalance_success"
+            - rebalance_start:
+                  alias: "rebalance_start"
+        others:
+            - rebalanceStatus:
+                  alias: "rebalanceStatus"
+                  convert:
+                    "none" : 0
+    nodes:
+        include: "true"
+        systemStats:
+            - cpu_utilization_rate:
+                  alias: "cpu_utilization_rate"
+            - swap_total:
+                  alias: "swap_total"
+            - swap_used:
+                  alias: "swap_used"
+            - mem_total:
+                  alias: "mem_total"
+            - mem_free:
+                  alias: "mem_free"
+        interestingStats:
+            - cmd_get:
+                  alias: "cmd_get"
+            - couch_docs_actual_disk_size:
+                  alias: "couch_docs_actual_disk_size"
+            - couch_docs_data_size:
+                  alias: "couch_docs_data_size"
+            - couch_spatial_data_size:
+                  alias: "couch_spatial_data_size"
+            - couch_spatial_disk_size:
+                  alias: "couch_spatial_disk_size"
+            - couch_views_actual_disk_size:
+                  alias: "couch_views_actual_disk_size"
+            - couch_views_data_size:
+                  alias: "couch_views_data_size"
+            - curr_items:
+                  alias: "curr_items"
+            - curr_items_tot:
+                  alias: "curr_items_tot"
+            - ep_bg_fetched:
+                  alias: "ep_bg_fetched"
+            - get_hits:
+                  alias: "get_hits"
+            - mem_used:
+                  alias: "mem_used"
+            - ops:
+                  alias: "ops"
+            - vb_replica_curr_items:
+                  alias: "vb_replica_curr_items"
+        otherStats:
+            - clusterMembership:
+                  alias: "clusterMembership"
+                  convert:
+                    "active" : 1
+                    "inactiveAdded" : 2
+                    "inactiveFailed" : 3
+            - status:
+                  alias: "status"
+                  convert:
+                    "healthy" : 1
+                    "warmup" : 2
+    buckets:
+        include: "true"
+        quota:
+            - ram:
+                  alias: "ram"
+            - rawRAM:
+                  alias: "rawRam"
+        basicStats:
+            - quotaPercentUsed:
+                  alias: "quotaPercentUsed"
+            - opsPerSec:
+                  alias: "opsPerSec"
+            - diskFetches:
+                  alias: "diskFetches"
+            - itemCount:
+                  alias: "itemCount"
+            - diskUsed:
+                  alias: "diskUsed"
+            - dataUsed:
+                  alias: "dataUsed"
+            - memUsed:
+                  alias: "memUsed"
+        otherStats:
+            # - couch_total_disk_size:
+            - couch_docs_fragmentation:
+                  alias: "couch_docs_fragmentation"
+            - couch_views_fragmentation:
+                  alias: "couch_views_fragmentation"
+            # - hit_ratio:
+            - ep_cache_miss_rate:
+                  alias: "ep_cache_miss_rate"
+            # - ep_resident_items_rate:
+            # - vb_avg_active_queue_age:
+            # - vb_avg_replica_queue_age:
+            # - vb_avg_pending_queue_age:
+            - vb_avg_total_queue_age:
+                 alias: "vb_avg_total_queue_age"
+            - vb_active_resident_items_ratio:
+                  alias: "vb_active_resident_items_ratio"
+            - vb_replica_resident_items_ratio:
+                  alias: "vb_replica_resident_items_ratio"
+            # - vb_pending_resident_items_ratio:
+            # - avg_disk_update_time:
+            # - avg_disk_commit_time:
+            # - avg_bg_wait_time:
+            # - avg_active_timestamp_drift:
+            # - avg_replica_timestamp_drift:
+            # - bg_wait_count:
+            # - bg_wait_total:
+            - bytes_read:
+            - bytes_written:
+            # - cas_badval:
+            # - cas_hits:
+            # - cas_misses:
+            - cmd_get:
+                  alias: "cmd_get"
+            - cmd_set:
+                  alias: "cmd_set"
+            - curr_connections:
+                  alias: "curr_connections"
+            # - curr_items:
+            # - curr_items_tot:
+            # - decr_hits:
+            # - decr_misses:
+            - delete_hits:
+                  alias: "delete_hits"
+            - delete_misses:
+                  alias: "delete_misses"
+            # - evictions:
+            # - get_hits:
+            # - get_misses:
+            # - incr_hits:
+            # - incr_misses:
+            # - mem_used:
+            # - misses:
+            - ops:
+                  alias: "ops"
+            # - xdc_ops:
+            # - cpu_idle_ms:
+            # - cpu_local_ms:
+            # - cpu_utilization_rate:
+            # - hibernated_requests:
+            # - hibernated_waked:
+            # - mem_actual_free:
+            # - mem_actual_used:
+            # - mem_free:
+            # - mem_total:
+            # - mem_used_sys:
+            # - rest_requests:
+            # - swap_total:
+            # - swap_used:
+    query:
+        include: "true"
+        systemVitals:
+            - request.completed.count:
+                  alias: "request.completed.count"
+            - request.active.count:
+                  alias: "request.active.count"
+            - request.per.sec.1min:
+                  alias: "request.per.sec.1min"
+            - request.per.sec.5min:
+                  alias: "request.per.sec.5min"
+            - request.per.sec.15min:
+                  alias: "request.per.sec.15min"
+            - request_time.mean:
+                  alias: "request_time.mean(ms)"
+            - request_time.median:
+                  alias: "request_time.median(ms)"
+            - request_time.80percentile:
+                  alias: "request_time.80percentile(ms)"
+            - request_time.95percentile:
+                  alias: "request_time.95percentile(ms)"
+            - request_time.99percentile:
+                  alias: "request_time.99percentile(ms)"
+            - request.prepared.percent:
+                  alias: "request.prepared.percent"
+    xdcr:
+        include: "true"
+        stats:
+            - bandwidth_usage: #Bandwidth used during replication, measured in bytes per second.
+                  alias: "bandwidth_usage"
+            - changes_left: #Number of updates still pending replication.
+                  alias: "changes_left"
+            # - data_replicated: #Size of data replicated in bytes.
+                  #alias: "data_replicated"
+            # - docs_checked: #Number of documents checked for changes.
+                  #alias: "docs_checked"
+            # - docs_failed_cr_source: #Number of documents that have failed conflict resolution on the source cluster and not replicated to target cluster.
+                  #alias: "docs_failed_cr_source"
+            # - docs_filtered: #Number of documents that have been filtered out and not replicated to target cluster.
+                  #alias: "docs_filtered"
+            # - docs_latency_wt: #Weighted average latency for sending replicated changes to destination cluster.
+                  #alias: "docs_latency_wt"
+            # - docs_opt_repd: #Number of docs sent optimistically.
+                  #alias: "docs_opt_repd"
+            # - docs_received_from_dcp: #Number of documents received from DCP.
+                  #alias: "docs_received_from_dcp"
+            # - docs_rep_queue: #Number of documents in replication queue.
+                  #alias: "docs_rep_queue"
+            # - docs_written: #Number of documents written to the destination cluster via xdcr.
+                  #alias: "docs_written"
+            # - meta_latency_wt: #Weighted average time for requesting document metadata. xdcr uses this for conflict resolution prior to sending the document into the replication queue.
+                  #alias: "meta_latency_wt"
+            # - num_checkpoints: #Number of checkpoints issued in replication queue.
+                  #alias: "num_checkpoints"
+            # - num_failedckpts: #Number of checkpoints failed during replication.
+                  #alias: "num_failedckpts"
+            # - rate_received_from_dcp: #Number of documents received from DCP per second.
+                  #alias: "rate_received_from_dcp"
+            # - rate_replication: #Rate of documents being replicated, measured in documents per second.
+                  #alias: "rate_replication"
+            # - size_rep_queue: #Size of replication queue in bytes.
+                  #alias: "size_rep_queue"
+            # - time_committing: #Seconds elapsed during replication.
+                  #alias: "time_committing"
+    index:
+        include: "true"
+        stats:
+            - memorySnapshotInterval:
+                  alias: "memorySnapshotInterval"
+            - stableSnapshotInterval:
+                  alias: "stableSnapshotInterval"
+            - maxRollbackPoints:
+                  alias: "maxRollbackPoints"
+
+
+

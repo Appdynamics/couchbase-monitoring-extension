@@ -1,0 +1,160 @@
+{
+  "storageTotals": {
+    "ram": {
+      "total": 2095882240,
+      "quotaTotal": 1048576000,
+      "quotaUsed": 314572800,
+      "used": 1978900480,
+      "usedByData": 148932616,
+      "quotaUsedPerNode": 314572800,
+      "quotaTotalPerNode": 1048576000
+    },
+    "hdd": {
+      "total": 67371577344,
+      "quotaTotal": 67371577344,
+      "used": 11453168148,
+      "usedByData": 65993943,
+      "free": 55918409196
+    }
+  },
+  "ftsMemoryQuota": 512,
+  "indexMemoryQuota": 512,
+  "memoryQuota": 1000,
+  "name": "default",
+  "alerts": [],
+  "alertsSilenceURL": "/controller/resetAlerts?token=0&uuid=8c56ada6fc33c238ff6aa3eb83337ff7",
+  "nodes": [{
+    "systemStats": {
+      "cpu_utilization_rate": 7.733333333333333,
+      "swap_total": 1073737728,
+      "swap_used": 712269824,
+      "mem_total": 2095882240,
+      "mem_free": 325193728
+    },
+    "interestingStats": {
+      "cmd_get": 0,
+      "couch_docs_actual_disk_size": 65224385,
+      "couch_docs_data_size": 50432000,
+      "couch_spatial_data_size": 0,
+      "couch_spatial_disk_size": 0,
+      "couch_views_actual_disk_size": 769558,
+      "couch_views_data_size": 769558,
+      "curr_items": 38894,
+      "curr_items_tot": 38894,
+      "ep_bg_fetched": 0,
+      "get_hits": 0,
+      "mem_used": 148932616,
+      "ops": 0,
+      "vb_replica_curr_items": 0
+    },
+    "uptime": "60620",
+    "memoryTotal": 2095882240,
+    "memoryFree": 325193728,
+    "mcdMemoryReserved": 1599,
+    "mcdMemoryAllocated": 1599,
+    "couchApiBase": "http://172.17.0.2:8092/",
+    "couchApiBaseHTTPS": "https://172.17.0.2:18092/",
+    "clusterMembership": "active",
+    "recoveryType": "none",
+    "status": "healthy",
+    "otpNode": "ns_1@127.0.0.1",
+    "thisNode": true,
+    "hostname": "172.17.0.2:8091",
+    "clusterCompatibility": 262150,
+    "version": "4.6.3-4136-enterprise",
+    "os": "x86_64-unknown-linux-gnu",
+    "ports": {
+      "sslProxy": 11214,
+      "httpsMgmt": 18091,
+      "httpsCAPI": 18092,
+      "proxy": 11211,
+      "direct": 11210
+    },
+    "services": ["index", "kv", "n1ql"]
+  }],
+  "buckets": {
+    "uri": "/pools/default/buckets?v=97948859&uuid=8c56ada6fc33c238ff6aa3eb83337ff7",
+    "terseBucketsBase": "/pools/default/b/",
+    "terseStreamingBucketsBase": "/pools/default/bs/"
+  },
+  "remoteClusters": {
+    "uri": "/pools/default/remoteClusters?uuid=8c56ada6fc33c238ff6aa3eb83337ff7",
+    "validateURI": "/pools/default/remoteClusters?just_validate=1"
+  },
+  "controllers": {
+    "addNode": {
+      "uri": "/controller/addNodeV2?uuid=8c56ada6fc33c238ff6aa3eb83337ff7"
+    },
+    "rebalance": {
+      "uri": "/controller/rebalance?uuid=8c56ada6fc33c238ff6aa3eb83337ff7"
+    },
+    "failOver": {
+      "uri": "/controller/failOver?uuid=8c56ada6fc33c238ff6aa3eb83337ff7"
+    },
+    "startGracefulFailover": {
+      "uri": "/controller/startGracefulFailover?uuid=8c56ada6fc33c238ff6aa3eb83337ff7"
+    },
+    "reAddNode": {
+      "uri": "/controller/reAddNode?uuid=8c56ada6fc33c238ff6aa3eb83337ff7"
+    },
+    "reFailOver": {
+      "uri": "/controller/reFailOver?uuid=8c56ada6fc33c238ff6aa3eb83337ff7"
+    },
+    "ejectNode": {
+      "uri": "/controller/ejectNode?uuid=8c56ada6fc33c238ff6aa3eb83337ff7"
+    },
+    "setRecoveryType": {
+      "uri": "/controller/setRecoveryType?uuid=8c56ada6fc33c238ff6aa3eb83337ff7"
+    },
+    "setAutoCompaction": {
+      "uri": "/controller/setAutoCompaction?uuid=8c56ada6fc33c238ff6aa3eb83337ff7",
+      "validateURI": "/controller/setAutoCompaction?just_validate=1"
+    },
+    "clusterLogsCollection": {
+      "startURI": "/controller/startLogsCollection?uuid=8c56ada6fc33c238ff6aa3eb83337ff7",
+      "cancelURI": "/controller/cancelLogsCollection?uuid=8c56ada6fc33c238ff6aa3eb83337ff7"
+    },
+    "replication": {
+      "createURI": "/controller/createReplication?uuid=8c56ada6fc33c238ff6aa3eb83337ff7",
+      "validateURI": "/controller/createReplication?just_validate=1"
+    }
+  },
+  "rebalanceStatus": "none",
+  "rebalanceProgressUri": "/pools/default/rebalanceProgress",
+  "stopRebalanceUri": "/controller/stopRebalance?uuid=8c56ada6fc33c238ff6aa3eb83337ff7",
+  "nodeStatusesUri": "/nodeStatuses",
+  "maxBucketCount": 10,
+  "autoCompactionSettings": {
+    "parallelDBAndViewCompaction": false,
+    "databaseFragmentationThreshold": {
+      "percentage": 30,
+      "size": "undefined"
+    },
+    "viewFragmentationThreshold": {
+      "percentage": 30,
+      "size": "undefined"
+    },
+    "indexCompactionMode": "circular",
+    "indexCircularCompaction": {
+      "daysOfWeek": "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday",
+      "interval": {
+        "fromHour": 0,
+        "toHour": 0,
+        "fromMinute": 0,
+        "toMinute": 0,
+        "abortOutside": false
+      }
+    },
+    "indexFragmentationThreshold": {
+      "percentage": 30
+    }
+  },
+  "tasks": {
+    "uri": "/pools/default/tasks?v=56740006"
+  },
+  "counters": {},
+  "indexStatusURI": "/indexStatus?v=29368567",
+  "checkPermissionsURI": "/pools/default/checkPermissions?v=110586395",
+  "serverGroupsUri": "/pools/default/serverGroups?v=52184775",
+  "clusterName": ""
+}
