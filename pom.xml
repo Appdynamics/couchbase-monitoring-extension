@@ -178,7 +178,7 @@
 								<copy todir="${target.dir}">
 									<fileset dir="${build.directory}" includes="${project.artifactId}.${project.packaging}" />
 								</copy>
-								<zip destfile="${target.dir} v${project.version}.zip">
+								<zip destfile="${target.dir}-${project.version}.zip">
 									<zipfileset dir="${target.dir}" filemode="755" prefix="CouchBaseMonitor/" />
 								</zip>
 								<delete dir="${target.dir}" />

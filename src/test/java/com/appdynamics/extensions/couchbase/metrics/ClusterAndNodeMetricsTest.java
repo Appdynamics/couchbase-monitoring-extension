@@ -29,10 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-/*
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ClusterAndNodeMetrics.class, HttpClientUtils.class, CouchBaseMonitorTask.class})
-*/
+
 
 public class ClusterAndNodeMetricsTest{
 
@@ -78,6 +75,10 @@ public class ClusterAndNodeMetricsTest{
         metricNames.add("quotaUsed");
         metricNames.add("quotaUsedPerNode");
         metricNames.add("quotaTotalPerNode");
+        metricNames.add("rebalance_success");
+        metricNames.add("rebalance_start");
+        metricNames.add("rebalance_success");
+        metricNames.add("rebalanceStatus");
         metricNames.add("cmd_get");
         metricNames.add("couch_docs_actual_disk_size");
         metricNames.add("couch_docs_data_size");
@@ -97,10 +98,11 @@ public class ClusterAndNodeMetricsTest{
         metricNames.add("swap_used");
         metricNames.add("mem_total");
         metricNames.add("mem_free");
+        metricNames.add("clusterMembership");
+        metricNames.add("status");
+
         for(Metric metric : resultList){
             Assert.assertTrue(metricNames.contains(metric.getMetricName()));
-            //System.out.println(metric.getMetricName() + " : " + metric.getMetricValue());
         }
-        Assert.assertTrue(resultList.size() == 31);
     }
 }

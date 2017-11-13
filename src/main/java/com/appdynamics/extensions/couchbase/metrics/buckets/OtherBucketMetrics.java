@@ -9,11 +9,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import static com.appdynamics.extensions.couchbase.utils.Constants.*;
-import static com.appdynamics.extensions.couchbase.utils.JsonUtils.*;
+
+import static com.appdynamics.extensions.couchbase.utils.Constants.INDIVIDUAL_BUCKET_ENDPOINT;
+import static com.appdynamics.extensions.couchbase.utils.Constants.METRIC_SEPARATOR;
+import static com.appdynamics.extensions.couchbase.utils.JsonUtils.getMetricsFromArray;
 
 /**
  * Created by venkata.konala on 9/20/17.
@@ -42,9 +45,17 @@ class OtherBucketMetrics implements Runnable{
     }
 
     public void run(){
-        List<Metric> individualBucketMetricsList = gatherIndividualBucketMetrics();
-        metricWriteHelper.transformAndPrintMetrics(individualBucketMetricsList);
-        latch.countDown();
+        try {
+            List<Metric> individualBucketMetricsList = gatherIndividualBucketMetrics();
+            metricWriteHelper.transformAndPrintMetrics(individualBucketMetricsList);
+        }
+        catch(Exception e){
+            logger.error("Something unforeseen happened", e);
+        }
+        finally{
+            latch.countDown();
+        }
+
     }
 
     private List<Metric> gatherIndividualBucketMetrics(){
@@ -55,7 +66,7 @@ class OtherBucketMetrics implements Runnable{
             JsonNode opJsonNode = rootJsonNode.get("op");
             if (opJsonNode != null) {
                 JsonNode sampleJsonNode = opJsonNode.get("samples");
-                individualBucketMetricsList.addAll(getMetricsFromArray(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + "buckets" + METRIC_SEPARATOR + bucketName, otherBucketMetricsList, sampleJsonNode));
+                individualBucketMetricsList.addAll(getMetricsFromArray(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "buckets" + METRIC_SEPARATOR + bucketName, otherBucketMetricsList, sampleJsonNode));
             }
         }
         return individualBucketMetricsList;

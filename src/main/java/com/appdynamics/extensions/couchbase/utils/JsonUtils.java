@@ -5,6 +5,7 @@ import com.appdynamics.extensions.util.AssertUtils;
 import com.google.common.collect.Lists;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class JsonUtils {
             if(sectionMetricsList != null) {
                 metricList.addAll(getMetrics(metricPath + METRIC_SEPARATOR + sectionName, sectionMetricsList, clusterJsonNode.get(sectionName) == null ? clusterJsonNode : clusterJsonNode.get(sectionName)));
             }
-            else{
+            else {
                 logger.debug("The {} section does not have any metrics specified in config.yml", sectionName);
             }
         }
@@ -42,7 +43,7 @@ public class JsonUtils {
                 if(sectionMetricsList != null) {
                     metricList.addAll(getMetrics(metricPath + METRIC_SEPARATOR + nodeOrBucketname + METRIC_SEPARATOR + section, sectionMetricsList, node.get(section) == null ? node : node.get(section)));
                 }
-                else{
+                else {
                     logger.debug("The {} section does not have any metrics specified in config.yml", section);
                 }
             }
@@ -86,10 +87,10 @@ public class JsonUtils {
             if(jsonValue != null && jsonValue.isArray()){
                 JsonNode lastValueNode = jsonValue.get(jsonValue.size() - 1);
                 Metric individualMetric;
-                if(metricProperties != null){
+                if(metricProperties != null) {
                     individualMetric = new Metric(metricName, lastValueNode.asText(), metricPath + METRIC_SEPARATOR + metricName, metricProperties);
                 }
-                else{
+                else {
                     individualMetric = new Metric(metricName, lastValueNode.asText(), metricPath + METRIC_SEPARATOR + metricName);
                 }
                 metricList.add(individualMetric);

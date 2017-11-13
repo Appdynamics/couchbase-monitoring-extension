@@ -59,7 +59,6 @@ public class IndividualXDCRBucketsTest {
         CountDownLatch latch = new CountDownLatch(1);
 
         when(configuration.getHttpClient()).thenReturn(httpClient);
-        //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
         when(configuration.getExecutorService()).thenReturn(executorService);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
@@ -77,7 +76,7 @@ public class IndividualXDCRBucketsTest {
         metricNames.add("status");
         for(Metric metric : resultList){
             Assert.assertTrue(metricNames.contains(metric.getMetricName()));
-            Assert.assertTrue(metric.getMetricValue().equalsIgnoreCase("running"));
+            Assert.assertTrue(metric.getMetricValue().equalsIgnoreCase("1"));
         }
         Assert.assertTrue(resultList.size() == 1);
     }

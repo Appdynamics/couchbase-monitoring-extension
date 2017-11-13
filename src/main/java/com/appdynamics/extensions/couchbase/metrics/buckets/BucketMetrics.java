@@ -8,6 +8,7 @@ import com.google.common.collect.Sets;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,14 +45,20 @@ public class BucketMetrics implements Runnable {
     }
 
     public void run(){
-        if(bucketMap != null && bucketMap.get("include") != null && bucketMap.get("include").toString().equalsIgnoreCase("true")) {
-            List<Metric> bucketMetrics = bucketMetricsProcessor.gatherBucketMetrics(configuration, httpClient, clusterName, serverURL, bucketMap, bucketsSet);
-            metricWriteHelper.transformAndPrintMetrics(bucketMetrics);
-            bucketMetricsProcessor.getIndividualBucketMetrics(configuration, metricWriteHelper, clusterName, serverURL, bucketMap, bucketsSet);
+        try {
+            if (bucketMap != null && bucketMap.get("include") != null && bucketMap.get("include").toString().equalsIgnoreCase("true")) {
+                List<Metric> bucketMetrics = bucketMetricsProcessor.gatherBucketMetrics(configuration, httpClient, clusterName, serverURL, bucketMap, bucketsSet);
+                metricWriteHelper.transformAndPrintMetrics(bucketMetrics);
+                bucketMetricsProcessor.getIndividualBucketMetrics(configuration, metricWriteHelper, clusterName, serverURL, bucketMap, bucketsSet);
+            } else {
+                logger.debug("The metrics in 'buckets' section are not processed either because it is not present (or) 'include' parameter is either null or false");
+            }
         }
-        else{
-            logger.debug("The metrics in 'buckets' section are not processed either because it is not present (or) 'include' parameter is either null or false");
+        catch(Exception e){
+
         }
-        countDownLatch.countDown();
+        finally {
+            countDownLatch.countDown();
+        }
     }
 }

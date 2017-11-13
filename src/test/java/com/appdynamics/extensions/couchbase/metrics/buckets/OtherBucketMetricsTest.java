@@ -52,7 +52,6 @@ public class OtherBucketMetricsTest {
         CountDownLatch latch = new CountDownLatch(1);
 
         when(configuration.getHttpClient()).thenReturn(httpClient);
-        //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
         when(configuration.getExecutorService()).thenReturn(executorService);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);

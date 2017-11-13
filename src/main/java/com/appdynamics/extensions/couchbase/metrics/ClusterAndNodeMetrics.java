@@ -9,12 +9,16 @@ import com.google.common.collect.Sets;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import static com.appdynamics.extensions.couchbase.utils.Constants.*;
-import static com.appdynamics.extensions.couchbase.utils.JsonUtils.*;
+
+import static com.appdynamics.extensions.couchbase.utils.Constants.CLUSTER_NODES_ENDPOINT;
+import static com.appdynamics.extensions.couchbase.utils.Constants.METRIC_SEPARATOR;
+import static com.appdynamics.extensions.couchbase.utils.JsonUtils.getClusterMetrics;
+import static com.appdynamics.extensions.couchbase.utils.JsonUtils.getNodeOrBucketMetrics;
 
 /**
  * Created by venkata.konala on 9/18/17.
@@ -45,9 +49,20 @@ public class ClusterAndNodeMetrics implements Runnable {
     }
 
     public void run(){
-       List<Metric> clusterAndNodeMetrics = gatherClusterAndNodeMetrics();
-       metricWriteHelper.transformAndPrintMetrics(clusterAndNodeMetrics);
-       countDownLatch.countDown();
+        //Since the main task is waiting on this subtask to finish, make sure that the latch is counted down no matter what.
+        //If there is an error in the subtask and it ends without counting down the latch, the main task will wait for the
+        //latch forever. This will stall the DerivedMetricsCalculation and also the main task will wait in the scheduler queue
+        //forever creating inconsistencies. So make sure the latch is counted down by using finally block.
+        try {
+            List<Metric> clusterAndNodeMetrics = gatherClusterAndNodeMetrics();
+            metricWriteHelper.transformAndPrintMetrics(clusterAndNodeMetrics);
+        }
+        catch(Exception e){
+            logger.error(e.getMessage());
+        }
+        finally {
+            countDownLatch.countDown();
+        }
     }
 
     private List<Metric> gatherClusterAndNodeMetrics(){

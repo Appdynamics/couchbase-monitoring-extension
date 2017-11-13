@@ -4,10 +4,12 @@ import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
 import com.appdynamics.extensions.http.HttpClientUtils;
 import com.appdynamics.extensions.metrics.Metric;
+import com.appdynamics.extensions.util.AssertUtils;
 import com.google.common.collect.Lists;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.LoggerFactory;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -69,6 +71,7 @@ public class IndividualXDCRMetric implements Runnable{
                     for(JsonNode jsonValue : nodeStats){
                         if(jsonValue.isArray()){
                             JsonNode lastJasonValue = jsonValue.get(jsonValue.size() - 1);
+                            AssertUtils.assertNotNull(lastJasonValue, "Value null or empty");
                             Metric individualMetric;
                             if(metricProperties != null){
                                 individualMetric = new Metric(metricName, lastJasonValue.asText(), configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "xdcr" + METRIC_SEPARATOR + bucketName  + METRIC_SEPARATOR + metricName, metricProperties);

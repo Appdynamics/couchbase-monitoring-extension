@@ -24,15 +24,12 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class QueryServiceMetricsTest{
 
-    MonitorConfiguration configuration = mock(MonitorConfiguration.class);
+ MonitorConfiguration configuration = mock(MonitorConfiguration.class);
     MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
     CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
     CloseableHttpResponse response = mock(CloseableHttpResponse.class);
@@ -48,19 +45,16 @@ public class QueryServiceMetricsTest{
     }
 
     @Test
-    public void clusterAndNodeMetricsTest() throws IOException{
+    public void queryMetricsTest() throws IOException{
         ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
         CountDownLatch latch = new CountDownLatch(1);
-
-        when(configuration.getHttpClient()).thenReturn(httpClient);
-        //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(response.getEntity()).thenReturn(entity);
-
         Map<String, ?> metricsMap = (Map<String, ?>)conf.get("metrics");
-        QueryServiceMetrics queryServiceMetrics = new QueryServiceMetrics(configuration, metricWriteHelper, "cluster1", "localhost:8090", metricsMap, latch);
+        List<Map<String, String>> serversList = (List<Map<String, String>>)conf.get("servers");
+        QueryServiceMetrics queryServiceMetrics = new QueryServiceMetrics(configuration, metricWriteHelper, httpClient, serversList.get(0),"cluster1", metricsMap, latch);
         queryServiceMetrics.run();
         verify(metricWriteHelper, times(1)).transformAndPrintMetrics(pathCaptor.capture());
         List<Metric> resultList = pathCaptor.getValue();
@@ -81,4 +75,5 @@ public class QueryServiceMetricsTest{
         }
         Assert.assertTrue(resultList.size() == 11);
     }
+
 }

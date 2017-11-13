@@ -9,9 +9,11 @@ import com.google.common.collect.Lists;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+
 import static com.appdynamics.extensions.couchbase.utils.Constants.METRIC_SEPARATOR;
 
 /**
@@ -57,7 +59,7 @@ public class IndividualXDCRBuckets implements Runnable {
 
         List<Metric> xdcrStatusMetrics = Lists.newArrayList();
         //#TODO take care of metric path
-        Metric statusMetric = new Metric("status", xdcrBucketNode.get("status").getTextValue(), configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "xdcr" + METRIC_SEPARATOR + bucketName + METRIC_SEPARATOR + "status");
+        Metric statusMetric = new Metric("status", xdcrBucketNode.get("status").getTextValue().equalsIgnoreCase("running") ? "1" : "0", configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "xdcr" + METRIC_SEPARATOR + bucketName + METRIC_SEPARATOR + "status");
         xdcrStatusMetrics.add(statusMetric);
 
         CountDownLatch latch = new CountDownLatch(xdcrMetricsList.size());

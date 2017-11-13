@@ -25,10 +25,7 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class IndexMetricsTest{
@@ -56,7 +53,6 @@ public class IndexMetricsTest{
         CountDownLatch latch = new CountDownLatch(1);
 
         when(configuration.getHttpClient()).thenReturn(httpClient);
-        //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
@@ -83,7 +79,6 @@ public class IndexMetricsTest{
         CountDownLatch latch = new CountDownLatch(1);
 
         when(configuration.getHttpClient()).thenReturn(httpClient);
-        //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);

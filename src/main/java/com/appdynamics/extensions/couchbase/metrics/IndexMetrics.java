@@ -10,11 +10,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import static com.appdynamics.extensions.couchbase.utils.Constants.*;
-import static com.appdynamics.extensions.couchbase.utils.JsonUtils.*;
+
+import static com.appdynamics.extensions.couchbase.utils.Constants.INDEX_ENDPOINT;
+import static com.appdynamics.extensions.couchbase.utils.Constants.METRIC_SEPARATOR;
+import static com.appdynamics.extensions.couchbase.utils.JsonUtils.getMetrics;
 
 /**
  * Created by venkata.konala on 9/18/17.
@@ -41,14 +44,20 @@ public class IndexMetrics implements Runnable {
     }
 
     public void run(){
-        if(indexMap != null && indexMap.get("include") != null && indexMap.get("include").toString().equalsIgnoreCase("true")) {
-            List<Metric> indexMetrics = gatherIndexMetrics();
-            metricWriteHelper.transformAndPrintMetrics(indexMetrics);
+        try {
+            if (indexMap != null && indexMap.get("include") != null && indexMap.get("include").toString().equalsIgnoreCase("true")) {
+                List<Metric> indexMetrics = gatherIndexMetrics();
+                metricWriteHelper.transformAndPrintMetrics(indexMetrics);
+            } else {
+                logger.debug("The metrics in 'index' section are not processed either because it is not present (or) 'include' parameter is either null or false");
+            }
         }
-        else{
-            logger.debug("The metrics in 'index' section are not processed either because it is not present (or) 'include' parameter is either null or false");
+        catch(Exception e){
+
         }
-        countDownLatch.countDown();
+        finally {
+            countDownLatch.countDown();
+        }
     }
 
     private List<Metric> gatherIndexMetrics(){
