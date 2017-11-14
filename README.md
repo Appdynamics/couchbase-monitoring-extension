@@ -6,6 +6,8 @@ Couchbase Server is an open source, distributed (shared-nothing architecture) No
 ## Prerequisites
 1. This extension works only with the standalone Java machine agent. The extension requires the machine agent to be up and running.
 2. This extension creates a client to the CouchBase server that needs to be monitored. So the CouchBase server that has to be monitored, should be available for access from the machine that has the extension installed.
+3. The client created through the extension uses various REST endpoints provided by the CouchBase server to retrieve metrics.
+Please make sure your user account has proper admin role to access all the [REST endpoints](https://developer.couchbase.com/documentation/server/5.0/rest-api/rest-endpoints-all.html). "Full" and "Cluster" level roles gives you access to all the REST endpoints.
 
 ## Installation
 1. Unzip the contents of "CouchBaseMonitor.zip" as "CouchBaseMonitor" and copy the "CouchBaseMonitor" directory to `<MACHINE_AGENT_HOME>/monitors/`
@@ -188,6 +190,31 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
 |memorySnapshotInterval        		|How often the indexer creates an in-memory snapshot for querying
 |stableSnapshotInterval  			|How often the indexer creates a persistent snapshot of recovery
 |maxRollbackPoints         		|Maximum number of rollback points
+
+## Workbench
+Workbench is a feature by which you can preview the metrics before registering it with the controller. This is useful if you want to fine tune the configurations. Workbench is embedded into the extension jar.
+To use the workbench, follow all the steps in installation and configuration.
+
+1. Start the workbench with the following command if you are in &lt;MACHINE_AGENT_HOME&gt;
+
+```
+      java -jar /monitors/CouchBaseMonitor/couchbase-monitoring-extension.jar 
+```      
+This starts an http server at http://host:9090/. This can be accessed from the browser.
+
+2. If the server is not accessible from outside/browser, you can use the following end points to see the list of registered metrics and errors.
+
+    Get the stats
+    ```
+    curl http://localhost:9090/api/stats
+    ```
+    Get the registered metrics
+    ```
+    curl http://localhost:9090/api/metric-paths
+    ```
+You can make the changes to config.yml and validate it from the browser or the API
+
+3. Once the configuration is complete, you can kill the workbench and start the Machine Agent.
 
 ## Version
 
