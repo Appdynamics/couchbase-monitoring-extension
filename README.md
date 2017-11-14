@@ -77,7 +77,7 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
      ```
      **All these metric properties are optional, and the default value shown in the table is applied to the metric(if a property has not been specified) by default.**
      
-     There are five categories of metrics i.e cluster, node , bucket, query, xdcr, index. To disable any of these sections, change the include parameter under the section to "false" as follows:
+     There are six categories of metrics i.e cluster, node , bucket, query, xdcr, index. To disable any of these sections, change the include parameter under the section to "false" as follows:
      ```
      index:
         include: "false"
@@ -147,17 +147,17 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
 ### Metric Category: query Metrics
 |           Metric Name           |                      Description                               |
 |---------------------------------|----------------------------------------------------------------|
-|request.completed.count        	|Bandwidth used during replication, measured in bytes per second
-|request.active.count  			      |Number of updates still pending replication
-|request.per.sec.1min         		|Size of data replicated in bytes
-|request.per.sec.5min             |
-|request.per.sec.15min            |
-|request_time.mean                |
-|request_time.median              |
-|request_time.80percentile        |
-|request_time.95percentile        |
-|request_time.99percentile        |
-|request.prepared.percent         |
+|request.completed.count        	|Number of requests completed
+|request.active.count  			      |Number of active requests
+|request.per.sec.1min         		|query throughput 1 minute
+|request.per.sec.5min             |query throughput 5 minutes
+|request.per.sec.15min            |query throughput 15 minutes
+|request_time.mean                |Mean time to comlete a request
+|request_time.median              |Median time to complete a request
+|request_time.80percentile        |80th percentile query response time
+|request_time.95percentile        |95th percentile query response time
+|request_time.99percentile        |99th percentile query response time
+|request.prepared.percent         |percentage of prepared requests
 
 
 ### Metric Category: xdcr Metrics
