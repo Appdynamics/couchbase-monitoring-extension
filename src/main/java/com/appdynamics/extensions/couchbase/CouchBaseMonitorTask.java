@@ -48,6 +48,7 @@ public class CouchBaseMonitorTask implements AMonitorTaskRunnable {
     public CouchBaseMonitorTask(MonitorConfiguration configuration, MetricWriteHelper metricWriteHelper, Map<String, String> server){
         this.configuration = configuration;
         this.metricWriteHelper = metricWriteHelper;
+        this.server = server;
         this.serverURL = UrlBuilder.fromYmlServerConfig(server).build();
         this.clusterName = server.get("name");
         AssertUtils.assertNotNull(clusterName, "Name of the cluster should not be null");
