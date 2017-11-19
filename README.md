@@ -94,16 +94,16 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
      
 ## Password encryption
 To avoid setting the clear text password in the config.yml, please follow the steps below to encrypt the password and set the encrypted password and the key in the config.yml:
-1. Download the util jar to encrypt the password from [here](https://github.com/Appdynamics/maven-repo/raw/master/releases/com/appdynamics/appd-exts-commons/2.0.0/appd-exts-commons-2.0.0.jar)
+1. Download the util jar to encrypt the password from [here](https://github.com/Appdynamics/maven-repo/raw/master/releases/com/appdynamics/appd-exts-commons/2.0.0/appd-exts-commons-2.0.0.jar).
 2. Encrypt password from the command line using the following command :
    ```
    java -cp "appd-exts-commons-2.0.0.jar" com.appdynamics.extensions.crypto.Encryptor myKey myPassword
    ```
-   where "myKey" is any random key
+   where "myKey" is any random key,
          "myPassword" is the actual password that needs to be encrypted
 3. Add the values for "encryptionKey", "passwordEncrypted" in the config.yml. 
    The value for "encryptionKey" is the value substitued for "myKey" in the above command.
-   The value for "passwordEncrypted" is the result of the above command
+   The value for "passwordEncrypted" is the result of the above command.
      
 ## Metrics
 
