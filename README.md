@@ -102,7 +102,7 @@ To avoid setting the clear text password in the config.yml, please follow the st
    where "myKey" is any random key,
          "myPassword" is the actual password that needs to be encrypted
 3. Add the values for "encryptionKey", "passwordEncrypted" in the config.yml. 
-   The value for "encryptionKey" is the value substitued for "myKey" in the above command.
+   The value for "encryptionKey" is the value substituted for "myKey" in the above command.
    The value for "passwordEncrypted" is the result of the above command.
      
 ## Metrics
