@@ -65,7 +65,7 @@ public class ClusterAndNodeMetrics implements Runnable {
             metricWriteHelper.transformAndPrintMetrics(clusterAndNodeMetrics);
         }
         catch(Exception e){
-            logger.error(e.getMessage());
+            logger.error("Caught an exception while fetching cluster and node metrics : ", e);
         }
         finally {
             countDownLatch.countDown();

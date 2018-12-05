@@ -62,7 +62,7 @@ public class BucketMetrics implements Runnable {
             }
         }
         catch(Exception e){
-
+            logger.error("Caught an exception while fetching bucket metrics : ", e);
         }
         finally {
             countDownLatch.countDown();

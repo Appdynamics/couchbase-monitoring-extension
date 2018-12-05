@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by venkata.konala on 9/18/17.
@@ -97,7 +98,7 @@ public class CouchBaseMonitorTask implements AMonitorTaskRunnable {
         //This task needs to wait for all the "subtasks" (in this case there are 5 subtasks) to finish. As the subtasks are responsible for printing the metrics, the main task have to
         // wait for all the subtasks finish. So latches are used to ensure this consistency is achieved.
         try{
-            countDownLatch.await();
+            countDownLatch.await(60, TimeUnit.SECONDS);
         }
         catch (InterruptedException ie){
             logger.error(ie.getMessage());

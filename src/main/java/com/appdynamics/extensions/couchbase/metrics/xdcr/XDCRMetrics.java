@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static com.appdynamics.extensions.couchbase.utils.Constants.TASKS_ENDPOINT;
 
@@ -53,17 +54,21 @@ public class XDCRMetrics implements Runnable{
     }
 
     public void run() {
-        if(xdcrMap != null && xdcrMap.get("include") != null && xdcrMap.get("include").toString().equalsIgnoreCase("true")) {
-            gatherXDCRBucketsSet();
-            List<Map<String, ?>> xdcrMetricsList = (List<Map<String, ?>>) xdcrMap.get("stats");
-            if (xdcrBucketsSet.size() != 0) {
-                getIndividualBucketXDCRMetrics(xdcrMetricsList);
+        try {
+            if (xdcrMap != null && xdcrMap.get("include") != null && xdcrMap.get("include").toString().equalsIgnoreCase("true")) {
+                gatherXDCRBucketsSet();
+                List<Map<String, ?>> xdcrMetricsList = (List<Map<String, ?>>) xdcrMap.get("stats");
+                if (xdcrBucketsSet.size() != 0) {
+                    getIndividualBucketXDCRMetrics(xdcrMetricsList);
+                }
+            } else {
+                logger.debug("The metrics in 'xdcr' section are not processed either because it is not present (or) 'include' parameter is either null or false");
             }
+        } catch (Exception e) {
+            logger.error("Caught an exception while fetching XDCR metrics : ", e);
+        } finally {
+            countDownLatch.countDown();
         }
-        else{
-            logger.debug("The metrics in 'xdcr' section are not processed either because it is not present (or) 'include' parameter is either null or false");
-        }
-        countDownLatch.countDown();
     }
 
     private void gatherXDCRBucketsSet(){
@@ -82,10 +87,10 @@ public class XDCRMetrics implements Runnable{
             executorService.submit(xdcrBucketNode.get("id").asText(), individualXDCRBucketsTask);
         }
         try {
-            latch.await();
+            latch.await(60, TimeUnit.SECONDS);
         }
         catch(InterruptedException ie){
-            logger.debug(ie.getMessage());
+            logger.error("The latch for Individual bucket XDCR metrics are interrupted : ", ie);
         }
     }
 

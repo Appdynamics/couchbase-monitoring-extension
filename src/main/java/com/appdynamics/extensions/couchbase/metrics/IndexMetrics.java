@@ -60,7 +60,7 @@ public class IndexMetrics implements Runnable {
             }
         }
         catch(Exception e){
-
+            logger.error("Caught an exception while gathering Index metrics : ", e);
         }
         finally {
             countDownLatch.countDown();

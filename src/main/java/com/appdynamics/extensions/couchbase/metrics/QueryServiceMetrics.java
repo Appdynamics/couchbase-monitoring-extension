@@ -62,10 +62,16 @@ public class QueryServiceMetrics implements Runnable {
             }
         }
         catch(Exception e){
-            logger.error(e.getMessage());
-
+            logger.error("Caught an exception while fetching query metrics : ", e);
         }
         finally {
+            try {
+                if (httpClient != null) {
+                    httpClient.close();
+                }
+            } catch (IOException ie) {
+                logger.error("Caught an exception while closing the query client : ", ie);
+            }
             countDownLatch.countDown();
         }
     }
@@ -81,9 +87,6 @@ public class QueryServiceMetrics implements Runnable {
         }
         catch(Exception e){
             logger.error(e.getMessage());
-        }
-        if(httpClient != null) {
-            httpClient.close();
         }
         return queryMetricsList;
     }

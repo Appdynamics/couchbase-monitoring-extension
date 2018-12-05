@@ -42,6 +42,7 @@ public class IndividualXDCRMetric implements Runnable{
     private CloseableHttpClient httpClient;
     private MetricWriteHelper metricWriteHelper;
     private List<Metric> xdcrMetricList;
+    private String metricName;
 
     IndividualXDCRMetric(MonitorConfiguration configuration, MetricWriteHelper metricWriteHelper, String clusterName, String serverURL, Map<String, ?> metric, String remote_uuid, String bucketName, String destinationName, CountDownLatch latch){
         this.configuration = configuration;
@@ -58,14 +59,19 @@ public class IndividualXDCRMetric implements Runnable{
     }
 
     public void run(){
-        gatherAndPrintXDCRMetric();
-        metricWriteHelper.transformAndPrintMetrics(xdcrMetricList);
-        latch.countDown();
+        try {
+            metricName = metric.entrySet().iterator().next().getKey();
+            gatherAndPrintXDCRMetric();
+            metricWriteHelper.transformAndPrintMetrics(xdcrMetricList);
+        } catch (Exception e) {
+            logger.error(String.format("Caught an exception while gathering XDCR metric : %s for bucket : %s", metricName, bucketName));
+        } finally {
+            latch.countDown();
+        }
     }
 
     private void gatherAndPrintXDCRMetric(){
         try {
-            String metricName = metric.entrySet().iterator().next().getKey();
             Map<String, ?> metricProperties = (Map<String, ?>) metric.entrySet().iterator().next().getValue();
             String xdcrEndPoint = URLEncoder.encode(String.format(XDCR_ENDPOINT + "/" + metricName, remote_uuid, bucketName, destinationName), "UTF-8");
             String bucketEndPoint = String.format(INDIVIDUAL_BUCKET_WITHOUT_ZOOM_ENDPPOINT, bucketName);
