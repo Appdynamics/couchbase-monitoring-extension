@@ -8,7 +8,7 @@
 package com.appdynamics.extensions.couchbase.metrics;
 
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.collect.Sets;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.*;
 
 public class QueryServiceMetricsTest{
 
- MonitorConfiguration configuration = mock(MonitorConfiguration.class);
+    MonitorContextConfiguration contextConfiguration = mock(MonitorContextConfiguration.class);
     MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
     CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
     CloseableHttpResponse response = mock(CloseableHttpResponse.class);
@@ -61,7 +61,7 @@ public class QueryServiceMetricsTest{
         when(response.getEntity()).thenReturn(entity);
         Map<String, ?> metricsMap = (Map<String, ?>)conf.get("metrics");
         List<Map<String, String>> serversList = (List<Map<String, String>>)conf.get("servers");
-        QueryServiceMetrics queryServiceMetrics = new QueryServiceMetrics(configuration, metricWriteHelper, httpClient, serversList.get(0),"cluster1", metricsMap, latch);
+        QueryServiceMetrics queryServiceMetrics = new QueryServiceMetrics(contextConfiguration, metricWriteHelper, httpClient, serversList.get(0),"cluster1", metricsMap, latch);
         queryServiceMetrics.run();
         verify(metricWriteHelper, times(1)).transformAndPrintMetrics(pathCaptor.capture());
         List<Metric> resultList = pathCaptor.getValue();
