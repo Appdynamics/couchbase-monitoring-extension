@@ -31,7 +31,7 @@ import static com.appdynamics.extensions.couchbase.utils.Constants.DEFAULT_METRI
  */
 public class CouchBaseMonitor extends ABaseMonitor {
 
-    private static final Logger logger = ExtensionsLoggerFactoryba.getLogger(CouchBaseMonitor.class);
+    private static final Logger logger = ExtensionsLoggerFactory.getLogger(CouchBaseMonitor.class);
 
     //Required for MonitorConfiguration initialisation
     @Override
