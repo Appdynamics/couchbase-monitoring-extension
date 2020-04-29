@@ -9,9 +9,9 @@ package com.appdynamics.extensions.couchbase;
 
 import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.util.AssertUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ import static com.appdynamics.extensions.couchbase.utils.Constants.DEFAULT_METRI
  */
 public class CouchBaseMonitor extends ABaseMonitor {
 
-    private static final Logger logger = LoggerFactory.getLogger(CouchBaseMonitor.class);
+    private static final Logger logger = ExtensionsLoggerFactory.getLogger(CouchBaseMonitor.class);
 
     //Required for MonitorConfiguration initialisation
     @Override
@@ -54,22 +54,21 @@ public class CouchBaseMonitor extends ABaseMonitor {
       */
     @Override
     protected void doRun(TasksExecutionServiceProvider taskExecutor) {
-        List<Map<String,String>> servers = (List<Map<String,String>>)configuration.getConfigYml().get("servers");
+        List<Map<String, String>> servers = (List<Map<String, String>>) getContextConfiguration().getConfigYml().get("servers");
         AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
         for (Map<String, String> server : servers) {
-            CouchBaseMonitorTask task = new CouchBaseMonitorTask(configuration, taskExecutor.getMetricWriteHelper(), server);
-            taskExecutor.submit(server.get("name"),task);
+            CouchBaseMonitorTask task = new CouchBaseMonitorTask(getContextConfiguration(), taskExecutor.getMetricWriteHelper(), server);
+            taskExecutor.submit(server.get("name"), task);
         }
     }
 
     /*
-      getTaskCount() is required by the TaskExecutionServiceProvider above to know the total number of tasks
-      it needs to wait on. Think of it as a count in the CountDownLatch.
-     */
-    @Override
-    protected int getTaskCount() {
-        List<Map<String,String>> servers = (List<Map<String,String>>)configuration.getConfigYml().get("servers");
+     getTaskCount() is required by the TaskExecutionServiceProvider above to know the total number of tasks
+     it needs to wait on. Think of it as a count in the CountDownLatch.
+    */
+    protected List<Map<String, ?>> getServers() {
+        List<Map<String, ?>> servers = (List<Map<String, ?>>) getContextConfiguration().getConfigYml().get("servers");
         AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
-        return servers.size();
+        return servers;
     }
 }

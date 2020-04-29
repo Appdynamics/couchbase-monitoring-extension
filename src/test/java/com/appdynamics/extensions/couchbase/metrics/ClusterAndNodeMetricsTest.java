@@ -8,7 +8,8 @@
 package com.appdynamics.extensions.couchbase.metrics;
 
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.conf.MonitorContext;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.collect.Sets;
@@ -40,7 +41,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 public class ClusterAndNodeMetricsTest{
 
-    MonitorConfiguration configuration = mock(MonitorConfiguration.class);
+    MonitorContextConfiguration contextConfiguration = mock(MonitorContextConfiguration.class);
+    MonitorContext context = mock(MonitorContext.class);
     MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
     CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
     CloseableHttpResponse response = mock(CloseableHttpResponse.class);
@@ -60,14 +62,15 @@ public class ClusterAndNodeMetricsTest{
         ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
         CountDownLatch latch = new CountDownLatch(1);
 
-        when(configuration.getHttpClient()).thenReturn(httpClient);
+        when(contextConfiguration.getContext()).thenReturn(context);
+        when(context.getHttpClient()).thenReturn(httpClient);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(response.getEntity()).thenReturn(entity);
 
         Map<String, ?> metricsMap = (Map<String, ?>)conf.get("metrics");
-        ClusterAndNodeMetrics clusterAndNodeMetrics = new ClusterAndNodeMetrics(configuration, metricWriteHelper,"cluster1", "localhost:8090", metricsMap, latch);
+        ClusterAndNodeMetrics clusterAndNodeMetrics = new ClusterAndNodeMetrics(contextConfiguration, metricWriteHelper,"cluster1", "localhost:8090", metricsMap, latch);
         clusterAndNodeMetrics.run();
 
         verify(metricWriteHelper, times(1)).transformAndPrintMetrics(pathCaptor.capture());

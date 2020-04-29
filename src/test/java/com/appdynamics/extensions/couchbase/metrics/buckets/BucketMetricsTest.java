@@ -8,8 +8,9 @@
 package com.appdynamics.extensions.couchbase.metrics.buckets;
 
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.MonitorExecutorService;
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.conf.MonitorContext;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
+import com.appdynamics.extensions.executorservice.MonitorExecutorService;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.collect.Sets;
@@ -31,17 +32,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anySet;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 public class BucketMetricsTest {
 
-    MonitorConfiguration configuration = mock(MonitorConfiguration.class);
+    MonitorContextConfiguration monitorContextConfiguration = mock(MonitorContextConfiguration.class);
+    MonitorContext context = mock(MonitorContext.class);
     MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
     CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
     MonitorExecutorService executorService = mock(MonitorExecutorService.class);
@@ -62,19 +61,20 @@ public class BucketMetricsTest {
     public void overallBucketMetricsTest() throws IOException{
         ArgumentCaptor<List> listCaptor = ArgumentCaptor.forClass(List.class);
 
-        when(configuration.getHttpClient()).thenReturn(httpClient);
+        when(monitorContextConfiguration.getContext()).thenReturn(context);
+        when(context.getHttpClient()).thenReturn(httpClient);
         //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
-        when(configuration.getExecutorService()).thenReturn(executorService);
+        when(context.getExecutorService()).thenReturn(executorService);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(response.getEntity()).thenReturn(entity);
         //when(configuration.getMetricWriter()).thenReturn(metricWriteHelper);
-        doNothing().when(bucketMetricsProcessor).getIndividualBucketMetrics(eq(configuration), eq(metricWriteHelper), eq("cluster1"), eq("localhost:8090"), anyMap(), anySet());
+        doNothing().when(bucketMetricsProcessor).getIndividualBucketMetrics(eq(monitorContextConfiguration), eq(metricWriteHelper), eq("cluster1"), eq("localhost:8090"), anyMap(), anySet());
 
         Map<String, ?> metricsMap =  (Map<String, ?>)conf.get("metrics");
         CountDownLatch latch = new CountDownLatch(1);
-        BucketMetrics bucketMetrics = new BucketMetrics(configuration, metricWriteHelper, "cluster1", "localhost:8090",  metricsMap, latch, bucketMetricsProcessor);
+        BucketMetrics bucketMetrics = new BucketMetrics(monitorContextConfiguration, metricWriteHelper, "cluster1", "localhost:8090",  metricsMap, latch, bucketMetricsProcessor);
         bucketMetrics.run();
 
         verify(metricWriteHelper, times(1)).transformAndPrintMetrics(listCaptor.capture());

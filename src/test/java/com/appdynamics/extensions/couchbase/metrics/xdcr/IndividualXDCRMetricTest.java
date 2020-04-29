@@ -8,8 +8,9 @@
 package com.appdynamics.extensions.couchbase.metrics.xdcr;
 
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.MonitorExecutorService;
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.conf.MonitorContext;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
+import com.appdynamics.extensions.executorservice.MonitorExecutorService;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.collect.Sets;
@@ -39,7 +40,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 public class IndividualXDCRMetricTest {
 
-    MonitorConfiguration configuration = mock(MonitorConfiguration.class);
+    MonitorContextConfiguration contextConfiguration = mock(MonitorContextConfiguration.class);
+    MonitorContext context = mock(MonitorContext.class);
     MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
     MonitorExecutorService executorService = mock(MonitorExecutorService.class);
     CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
@@ -62,8 +64,9 @@ public class IndividualXDCRMetricTest {
         ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
         CountDownLatch latch = new CountDownLatch(1);
 
-        when(configuration.getHttpClient()).thenReturn(httpClient);
-        when(configuration.getExecutorService()).thenReturn(executorService);
+        when(contextConfiguration.getContext()).thenReturn(context);
+        when(context.getHttpClient()).thenReturn(httpClient);
+        when(context.getExecutorService()).thenReturn(executorService);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
@@ -73,7 +76,7 @@ public class IndividualXDCRMetricTest {
         Map<String, ?> xdcrMap = (Map<String, ?>) metricsMap.get("xdcr");
         List<Map<String, ?>> xdcrList = (List<Map<String, ?>>)xdcrMap.get("stats");
         Map<String, ?> bandwidthMetric = (Map<String, ?>)xdcrList.get(0);
-        IndividualXDCRMetric xdcrMetrics = new IndividualXDCRMetric(configuration, metricWriteHelper, "cluster1", "localhost:8090", bandwidthMetric, "0222feac39bb82196a59d9b031ec9083", "beer-sample", "default", latch);
+        IndividualXDCRMetric xdcrMetrics = new IndividualXDCRMetric(contextConfiguration, metricWriteHelper, "cluster1", "localhost:8090", bandwidthMetric, "0222feac39bb82196a59d9b031ec9083", "beer-sample", "default", latch);
         xdcrMetrics.run();
 
         verify(metricWriteHelper, times(1)).transformAndPrintMetrics(pathCaptor.capture());

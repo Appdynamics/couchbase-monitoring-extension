@@ -8,10 +8,13 @@
 package com.appdynamics.extensions.couchbase.metrics.xdcr;
 
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.MonitorExecutorService;
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.conf.MonitorContext;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
+import com.appdynamics.extensions.executorservice.MonitorExecutorService;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.yml.YmlReader;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.http.StatusLine;
@@ -19,8 +22,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +43,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 public class IndividualXDCRBucketsTest {
 
-    MonitorConfiguration configuration = mock(MonitorConfiguration.class);
+    MonitorContextConfiguration contextConfiguration = mock(MonitorContextConfiguration.class);
+    MonitorContext context = mock(MonitorContext.class);
     MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
     MonitorExecutorService executorService = mock(MonitorExecutorService.class);
     CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
@@ -65,8 +67,9 @@ public class IndividualXDCRBucketsTest {
         ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
         CountDownLatch latch = new CountDownLatch(1);
 
-        when(configuration.getHttpClient()).thenReturn(httpClient);
-        when(configuration.getExecutorService()).thenReturn(executorService);
+        when(contextConfiguration.getContext()).thenReturn(context);
+        when(context.getHttpClient()).thenReturn(httpClient);
+        when(context.getExecutorService()).thenReturn(executorService);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
@@ -74,7 +77,7 @@ public class IndividualXDCRBucketsTest {
 
         List<Map<String, ?>> xdcrList = Lists.newArrayList();
         ObjectMapper mapper = new ObjectMapper();
-        IndividualXDCRBuckets xdcrMetrics = new IndividualXDCRBuckets(configuration, metricWriteHelper, "cluster1", "localhost:8090",  mapper.readValue(entity.getContent(), JsonNode.class),xdcrList, latch);
+        IndividualXDCRBuckets xdcrMetrics = new IndividualXDCRBuckets(contextConfiguration, metricWriteHelper, "cluster1", "localhost:8090",  mapper.readValue(entity.getContent(), JsonNode.class),xdcrList, latch);
         xdcrMetrics.run();
 
         verify(metricWriteHelper, times(1)).transformAndPrintMetrics(pathCaptor.capture());

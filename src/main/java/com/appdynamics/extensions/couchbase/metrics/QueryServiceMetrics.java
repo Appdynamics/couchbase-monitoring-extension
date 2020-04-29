@@ -8,14 +8,14 @@
 package com.appdynamics.extensions.couchbase.metrics;
 
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.http.HttpClientUtils;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.metrics.Metric;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,8 +31,8 @@ import static com.appdynamics.extensions.couchbase.utils.JsonUtils.getMetrics;
  */
 public class QueryServiceMetrics implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(QueryServiceMetrics.class);
-    private MonitorConfiguration configuration;
+    private static final Logger logger = ExtensionsLoggerFactory.getLogger(QueryServiceMetrics.class);
+    private MonitorContextConfiguration contextConfiguration;
     private MetricWriteHelper metricWriteHelper;
     private CloseableHttpClient httpClient;
     private Map<String, String> server;
@@ -41,59 +41,58 @@ public class QueryServiceMetrics implements Runnable {
     private CountDownLatch countDownLatch;
 
 
-    public QueryServiceMetrics(MonitorConfiguration configuration, MetricWriteHelper metricWriteHelper, CloseableHttpClient httpClient, Map<String, String> server, String clusterName, Map<String, ?> metricsMap, CountDownLatch countDownLatch){
-        this.configuration = configuration;
+    public QueryServiceMetrics(MonitorContextConfiguration contextConfiguration, MetricWriteHelper metricWriteHelper, CloseableHttpClient httpClient, Map<String, String> server, String clusterName, Map<String, ?> metricsMap, CountDownLatch countDownLatch) {
+        this.contextConfiguration = contextConfiguration;
         this.metricWriteHelper = metricWriteHelper;
         this.httpClient = httpClient;
         this.server = server;
         this.clusterName = clusterName;
-        this.queryMap = (Map<String, ?>) metricsMap.get("query");;
+        this.queryMap = (Map<String, ?>) metricsMap.get("query");
+        ;
         this.countDownLatch = countDownLatch;
     }
 
-    public void run(){
-        try{
-            if(queryMap != null && queryMap.get("include") != null && queryMap.get("include").toString().equalsIgnoreCase("true")) {
+    public void run() {
+        try {
+            if (queryMap != null && queryMap.get("include") != null && queryMap.get("include").toString().equalsIgnoreCase("true")) {
                 List<Metric> queryMetricsList = gatherQueryMetrics();
                 metricWriteHelper.transformAndPrintMetrics(queryMetricsList);
-            }
-            else{
+            } else {
                 logger.debug("The metrics in 'query' section are not processed either because it is not present (or) 'include' parameter is either null or false");
             }
-        }
-        catch(Exception e){
-            logger.error(e.getMessage());
-
-        }
-        finally {
+        } catch (Exception e) {
+            logger.error("Caught an exception while fetching query metrics : ", e);
+        } finally {
+            try {
+                if (httpClient != null) {
+                    httpClient.close();
+                }
+            } catch (IOException ie) {
+                logger.error("Caught an exception while closing the query client : ", ie);
+            }
             countDownLatch.countDown();
         }
     }
 
-    private List<Metric> gatherQueryMetrics() throws IOException{
+    private List<Metric> gatherQueryMetrics() throws IOException {
         List<Metric> queryMetricsList = Lists.newArrayList();
         try {
             List<Map<String, ?>> vitalsList = (List<Map<String, ?>>) queryMap.get("systemVitals");
             String url = String.format(QUERY_SERVICE_URL, server.get("host"), Integer.parseInt(server.get("queryPort")));
             JsonNode rootJsonNode = HttpClientUtils.getResponseAsJson(httpClient, url, JsonNode.class);
-            queryMetricsList.addAll(getMetrics(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "query", vitalsList, rootJsonNode));
+            queryMetricsList.addAll(getMetrics(contextConfiguration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "query", vitalsList, rootJsonNode));
             msReplace(queryMetricsList);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             logger.error(e.getMessage());
-        }
-        if(httpClient != null) {
-            httpClient.close();
         }
         return queryMetricsList;
     }
 
 
-
-    private void msReplace(List<Metric> queryMetricList){
-        for(Metric metric : queryMetricList){
+    private void msReplace(List<Metric> queryMetricList) {
+        for (Metric metric : queryMetricList) {
             String metricValue = metric.getMetricValue();
-            if(metricValue.contains("ms")){
+            if (metricValue.contains("ms")) {
                 metric.setMetricValue(metricValue.replace("ms", ""));
             }
         }

@@ -8,8 +8,9 @@
 package com.appdynamics.extensions.couchbase.metrics.buckets;
 
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.MonitorExecutorService;
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.conf.MonitorContext;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
+import com.appdynamics.extensions.executorservice.MonitorExecutorService;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.yml.YmlReader;
 import org.apache.http.StatusLine;
@@ -37,7 +38,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 public class OtherBucketMetricsTest {
 
-    MonitorConfiguration configuration = mock(MonitorConfiguration.class);
+    MonitorContextConfiguration configuration = mock(MonitorContextConfiguration.class);
+    MonitorContext context = mock(MonitorContext.class);
     MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
     CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
     MonitorExecutorService executorService = mock(MonitorExecutorService.class);
@@ -58,8 +60,9 @@ public class OtherBucketMetricsTest {
         ArgumentCaptor<List> listCaptor = ArgumentCaptor.forClass(List.class);
         CountDownLatch latch = new CountDownLatch(1);
 
-        when(configuration.getHttpClient()).thenReturn(httpClient);
-        when(configuration.getExecutorService()).thenReturn(executorService);
+        when(configuration.getContext()).thenReturn(context);
+        when(context.getHttpClient()).thenReturn(httpClient);
+        when(context.getExecutorService()).thenReturn(executorService);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);

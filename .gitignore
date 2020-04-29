@@ -1,6 +1,5 @@
 *.class
 *.iml
-
 .idea
 dist
 build

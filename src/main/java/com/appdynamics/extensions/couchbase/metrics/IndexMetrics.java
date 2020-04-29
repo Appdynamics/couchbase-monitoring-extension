@@ -8,15 +8,15 @@
 package com.appdynamics.extensions.couchbase.metrics;
 
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.couchbase.metrics.buckets.BucketMetrics;
 import com.appdynamics.extensions.http.HttpClientUtils;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.metrics.Metric;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -31,8 +31,8 @@ import static com.appdynamics.extensions.couchbase.utils.JsonUtils.getMetrics;
  */
 public class IndexMetrics implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(BucketMetrics.class);
-    private MonitorConfiguration configuration;
+    private static final Logger logger = ExtensionsLoggerFactory.getLogger(BucketMetrics.class);
+    private MonitorContextConfiguration contextConfiguration;
     private String clusterName;
     private String serverURL;
     private Map<String, ?> indexMap;
@@ -40,17 +40,17 @@ public class IndexMetrics implements Runnable {
     private CloseableHttpClient httpClient;
     private MetricWriteHelper metricWriteHelper;
 
-    public IndexMetrics(MonitorConfiguration configuration, MetricWriteHelper metricWriteHelper, String clusterName, String serverURL, Map<String, ?> metricsMap, CountDownLatch countDownLatch){
-        this.configuration = configuration;
+    public IndexMetrics(MonitorContextConfiguration contextConfiguration, MetricWriteHelper metricWriteHelper, String clusterName, String serverURL, Map<String, ?> metricsMap, CountDownLatch countDownLatch) {
+        this.contextConfiguration = contextConfiguration;
         this.metricWriteHelper = metricWriteHelper;
         this.clusterName = clusterName;
         this.serverURL = serverURL;
         this.indexMap = (Map<String, ?>) metricsMap.get("index");
         this.countDownLatch = countDownLatch;
-        this.httpClient = this.configuration.getHttpClient();
+        this.httpClient = this.contextConfiguration.getContext().getHttpClient();
     }
 
-    public void run(){
+    public void run() {
         try {
             if (indexMap != null && indexMap.get("include") != null && indexMap.get("include").toString().equalsIgnoreCase("true")) {
                 List<Metric> indexMetrics = gatherIndexMetrics();
@@ -58,20 +58,18 @@ public class IndexMetrics implements Runnable {
             } else {
                 logger.debug("The metrics in 'index' section are not processed either because it is not present (or) 'include' parameter is either null or false");
             }
-        }
-        catch(Exception e){
-
-        }
-        finally {
+        } catch (Exception e) {
+            logger.error("Caught an exception while gathering Index metrics : ", e);
+        } finally {
             countDownLatch.countDown();
         }
     }
 
-    private List<Metric> gatherIndexMetrics(){
+    private List<Metric> gatherIndexMetrics() {
         List<Metric> bucketMetrics = Lists.newArrayList();
         JsonNode rootJsonNode = HttpClientUtils.getResponseAsJson(httpClient, serverURL + INDEX_ENDPOINT, JsonNode.class);
-        List<Map<String, ?>> metricsList = (List<Map<String, ?>>)indexMap.get("stats");
-        bucketMetrics.addAll(getMetrics(configuration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "index", metricsList, rootJsonNode));
+        List<Map<String, ?>> metricsList = (List<Map<String, ?>>) indexMap.get("stats");
+        bucketMetrics.addAll(getMetrics(contextConfiguration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "index", metricsList, rootJsonNode));
         return bucketMetrics;
     }
 }

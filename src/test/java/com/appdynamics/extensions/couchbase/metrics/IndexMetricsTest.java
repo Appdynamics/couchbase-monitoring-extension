@@ -8,7 +8,8 @@
 package com.appdynamics.extensions.couchbase.metrics;
 
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.conf.MonitorContext;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.collect.Sets;
@@ -32,12 +33,16 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 
 public class IndexMetricsTest{
 
-    MonitorConfiguration configuration = mock(MonitorConfiguration.class);
+    MonitorContextConfiguration contextConfiguration = mock(MonitorContextConfiguration.class);
+    MonitorContext context = mock(MonitorContext.class);
     MetricWriteHelper metricWriteHelper = mock(MetricWriteHelper.class);
     CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
     CloseableHttpResponse response = mock(CloseableHttpResponse.class);
@@ -59,14 +64,15 @@ public class IndexMetricsTest{
         ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
         CountDownLatch latch = new CountDownLatch(1);
 
-        when(configuration.getHttpClient()).thenReturn(httpClient);
+        when(contextConfiguration.getContext()).thenReturn(context);
+        when(context.getHttpClient()).thenReturn(httpClient);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(response.getEntity()).thenReturn(entity);
 
         Map<String, ?> metricsMap = (Map<String, ?>)conf.get("metrics");
-        IndexMetrics indexMetrics = new IndexMetrics(configuration, metricWriteHelper, "cluster1", "localhost:8090", metricsMap, latch);
+        IndexMetrics indexMetrics = new IndexMetrics(contextConfiguration, metricWriteHelper, "cluster1", "localhost:8090", metricsMap, latch);
         indexMetrics.run();
 
         verify(metricWriteHelper, times(1)).transformAndPrintMetrics(pathCaptor.capture());
@@ -85,14 +91,15 @@ public class IndexMetricsTest{
     public void indexMetricsWithIncludeFalseTest() throws IOException{
         CountDownLatch latch = new CountDownLatch(1);
 
-        when(configuration.getHttpClient()).thenReturn(httpClient);
+        when(contextConfiguration.getContext()).thenReturn(context);
+        when(context.getHttpClient()).thenReturn(httpClient);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(response.getEntity()).thenReturn(entity);
 
         Map<String, ?> metricsMap = (Map<String, ?>)confWithIncludeFalse.get("metrics");
-        IndexMetrics indexMetrics2 = new IndexMetrics(configuration, metricWriteHelper, "cluster1", "localhost:8090", metricsMap, latch);
+        IndexMetrics indexMetrics2 = new IndexMetrics(contextConfiguration, metricWriteHelper, "cluster1", "localhost:8090", metricsMap, latch);
         indexMetrics2.run();
 
         verify(metricWriteHelper, times(0)).transformAndPrintMetrics(anyList());
