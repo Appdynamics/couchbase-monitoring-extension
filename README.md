@@ -233,9 +233,9 @@ You can make the changes to config.yml and validate it from the browser or the A
 
 |                              |           |      
 |------------------------------|-----------|
-|Current version               |2.0.0      |
+|Current version               |2.0.2      |
 |CouchBase version tested on   |4.6        |
-|Last Update                   |11/13/2017 |
+|Last Update                   |04/28/2020 |
 
 2.0.0  -  Revamped the extension to support new extensions framework(2.0.0), Added 3 different categories of metrics(query, xdcr and index), Added extra metrics in cluster, node and bucket categories.
 
