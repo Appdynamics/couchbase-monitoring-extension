@@ -8,13 +8,13 @@
 package com.appdynamics.extensions.couchbase.metrics.buckets;
 
 import com.appdynamics.extensions.MetricWriteHelper;
-import com.appdynamics.extensions.MonitorExecutorService;
-import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
+import com.appdynamics.extensions.executorservice.MonitorExecutorService;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.metrics.Metric;
 import com.google.common.collect.Sets;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -26,8 +26,8 @@ import java.util.concurrent.CountDownLatch;
  */
 public class BucketMetrics implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(BucketMetrics.class);
-    private MonitorConfiguration configuration;
+    private static final Logger logger = ExtensionsLoggerFactory.getLogger(BucketMetrics.class);
+    private MonitorContextConfiguration contextConfiguration;
     private String clusterName;
     private String serverURL;
     private Map<String, ?> bucketMap;
@@ -38,33 +38,31 @@ public class BucketMetrics implements Runnable {
     private Set<String> bucketsSet;
     private BucketMetricsProcessor bucketMetricsProcessor;
 
-    public BucketMetrics(MonitorConfiguration configuration, MetricWriteHelper metricWriteHelper, String clusterName, String serverURL, Map<String, ?> metricsMap, CountDownLatch countDownLatch, BucketMetricsProcessor bucketMetricsProcessor){
-        this.configuration = configuration;
+    public BucketMetrics(MonitorContextConfiguration contextConfiguration, MetricWriteHelper metricWriteHelper, String clusterName, String serverURL, Map<String, ?> metricsMap, CountDownLatch countDownLatch, BucketMetricsProcessor bucketMetricsProcessor) {
+        this.contextConfiguration = contextConfiguration;
         this.metricWriteHelper = metricWriteHelper;
         this.clusterName = clusterName;
         this.serverURL = serverURL;
         this.bucketMap = (Map<String, ?>) metricsMap.get("buckets");
         this.countDownLatch = countDownLatch;
-        this.httpClient = this.configuration.getHttpClient();
-        this.executorService = this.configuration.getExecutorService();
+        this.httpClient = this.contextConfiguration.getContext().getHttpClient();
+        this.executorService = this.contextConfiguration.getContext().getExecutorService();
         this.bucketsSet = Sets.newHashSet();
         this.bucketMetricsProcessor = bucketMetricsProcessor;
     }
 
-    public void run(){
+    public void run() {
         try {
             if (bucketMap != null && bucketMap.get("include") != null && bucketMap.get("include").toString().equalsIgnoreCase("true")) {
-                List<Metric> bucketMetrics = bucketMetricsProcessor.gatherBucketMetrics(configuration, httpClient, clusterName, serverURL, bucketMap, bucketsSet);
+                List<Metric> bucketMetrics = bucketMetricsProcessor.gatherBucketMetrics(contextConfiguration, httpClient, clusterName, serverURL, bucketMap, bucketsSet);
                 metricWriteHelper.transformAndPrintMetrics(bucketMetrics);
-                bucketMetricsProcessor.getIndividualBucketMetrics(configuration, metricWriteHelper, clusterName, serverURL, bucketMap, bucketsSet);
+                bucketMetricsProcessor.getIndividualBucketMetrics(contextConfiguration, metricWriteHelper, clusterName, serverURL, bucketMap, bucketsSet);
             } else {
                 logger.debug("The metrics in 'buckets' section are not processed either because it is not present (or) 'include' parameter is either null or false");
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             logger.error("Caught an exception while fetching bucket metrics : ", e);
-        }
-        finally {
+        } finally {
             countDownLatch.countDown();
         }
     }
