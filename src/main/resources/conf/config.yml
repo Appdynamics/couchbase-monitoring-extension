@@ -23,6 +23,14 @@ encryptionKey: ""
 
 numberOfThreads: 50
 
+enableHealthChecks: false
+
+controllerInfo:
+  username: "username" # -Dappdynamics.agent.monitors.controller.username
+  account: "customer1" # -Dappdynamics.agent.accountName
+  password: "password" # -Dappdynamics.agent.monitors.controller.password
+  encryptedPassword: "" # -Dappdynamics.agent.monitors.controller.encryptedPassword
+
 metrics:
     cluster:
         include: "true"
@@ -280,6 +288,4 @@ metrics:
                   alias: "stableSnapshotInterval"
             - maxRollbackPoints:
                   alias: "maxRollbackPoints"
-
-
 

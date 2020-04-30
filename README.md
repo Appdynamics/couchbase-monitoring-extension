@@ -40,15 +40,26 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
           passwordEncrypted: ""
      ```
 
-  3. Configure the encyptionKey for passwordEncrypted(only if password encryption required). See next section for encrypting password.
+  3. Configure the encryptionKey for passwordEncrypted(only if password encryption required). See next section for encrypting password.
 
      For example,
      ```
      #Encryption key for Encrypted password.
      encryptionKey: "axcdde43535hdhdgfiniyy576"
      ```
+  
+  4. Configure the controllerInfo section
+     For example,
+     ```
+     controllerInfo:
+       username: "username" # Username used for controller login
+       account: "customer1" # Accountname in the controller
+       password: "password" #  Password for the above username 
+       encryptedPassword: "" # Only required if encrypting the password, else leave it empty
+     ```
+   
      
-  4. Configure the metrics section.
+  5. Configure the metrics section.
 
      For configuring the metrics, the following properties can be used:
 
@@ -234,7 +245,7 @@ You can make the changes to config.yml and validate it from the browser or the A
 |                              |           |      
 |------------------------------|-----------|
 |Current version               |2.0.2      |
-|CouchBase version tested on   |4.6        |
+|CouchBase version tested on   |6.5.1        |
 |Last Update                   |04/28/2020 |
 
 ##### 2.0.2 - Fixed the latch countdown issue for XDCR metrics. MA v20.3.0+ compatibility update.
