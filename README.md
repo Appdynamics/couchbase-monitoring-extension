@@ -248,6 +248,7 @@ You can make the changes to config.yml and validate it from the browser or the A
 |CouchBase version tested on   |6.5.1        |
 |Last Update                   |01/12/2021 |
 
+##### 2.0.3 - Moved to commons 2.2.4 version
 ##### 2.0.2 - Fixed the latch countdown issue for XDCR metrics. MA v20.3.0+ compatibility update.
 ##### 2.0.0 - Revamped the extension to support new extensions framework(2.0.0), Added 3 different categories of metrics(query, xdcr and index), Added extra metrics in cluster, node and bucket categories.
 
