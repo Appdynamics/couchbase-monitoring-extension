@@ -16,14 +16,12 @@ servers:
     queryPort: "8093"
     username: "Administrator"
     password: "password1"
-    passwordEncrypted: ""
+    encryptedPassword: ""
 
 #Encryption key for Encrypted password.
 encryptionKey: ""
 
 numberOfThreads: 50
-
-enableHealthChecks: false
 
 controllerInfo:
   username: "username" # -Dappdynamics.agent.monitors.controller.username
