@@ -23,8 +23,6 @@ encryptionKey: ""
 
 numberOfThreads: 50
 
-enableHealthChecks: false
-
 controllerInfo:
   username: "username" # -Dappdynamics.agent.monitors.controller.username
   account: "customer1" # -Dappdynamics.agent.accountName
