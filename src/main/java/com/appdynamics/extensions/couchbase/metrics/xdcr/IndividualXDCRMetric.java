@@ -13,6 +13,7 @@ import com.appdynamics.extensions.http.HttpClientUtils;
 import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.util.AssertUtils;
+import com.appdynamics.extensions.util.MetricPathUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -86,10 +87,11 @@ public class IndividualXDCRMetric implements Runnable {
                             JsonNode lastJasonValue = jsonValue.get(jsonValue.size() - 1);
                             AssertUtils.assertNotNull(lastJasonValue, "Value null or empty");
                             Metric individualMetric;
+                            String path = MetricPathUtils.buildMetricPath(contextConfiguration.getMetricPrefix(),clusterName,"xdcr",bucketName);
                             if (metricProperties != null) {
-                                individualMetric = new Metric(metricName, lastJasonValue.asText(), contextConfiguration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "xdcr" + METRIC_SEPARATOR + bucketName + METRIC_SEPARATOR + metricName, metricProperties);
+                                individualMetric = new Metric(metricName, lastJasonValue.asText(), path + METRIC_SEPARATOR + metricName, metricProperties);
                             } else {
-                                individualMetric = new Metric(metricName, lastJasonValue.asText(), contextConfiguration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "xdcr" + METRIC_SEPARATOR + bucketName + METRIC_SEPARATOR + metricName);
+                                individualMetric = new Metric(metricName, lastJasonValue.asText(), contextConfiguration.getMetricPrefix() + path + METRIC_SEPARATOR + metricName);
                             }
                             xdcrMetricList.add(individualMetric);
                         }

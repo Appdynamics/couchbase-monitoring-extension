@@ -244,9 +244,9 @@ You can make the changes to config.yml and validate it from the browser or the A
 
 |                              |           |      
 |------------------------------|-----------|
-|Current version               |2.0.3      |
+|Current version               |2.0.4      |
 |CouchBase version tested on   |6.5.1        |
-|Last Update                   |01/12/2021 |
+|Last Update                   |18/02/2021 |
 
 ##### 2.0.3 - Moved to commons 2.2.4 version
 ##### 2.0.2 - Fixed the latch countdown issue for XDCR metrics. MA v20.3.0+ compatibility update.

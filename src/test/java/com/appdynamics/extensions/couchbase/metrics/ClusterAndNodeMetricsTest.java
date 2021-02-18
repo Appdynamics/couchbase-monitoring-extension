@@ -11,6 +11,7 @@ import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorContext;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.metrics.Metric;
+import com.appdynamics.extensions.util.MetricPathUtils;
 import com.appdynamics.extensions.yml.YmlReader;
 import com.google.common.collect.Sets;
 import org.apache.http.StatusLine;
@@ -21,7 +22,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,7 +45,9 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 
-
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(MetricPathUtils.class)
+@PowerMockIgnore({ "javax.net.ssl.*" })
 public class ClusterAndNodeMetricsTest{
 
     MonitorContextConfiguration contextConfiguration = mock(MonitorContextConfiguration.class);
@@ -55,6 +64,7 @@ public class ClusterAndNodeMetricsTest{
         conf = YmlReader.readFromFile(new File("src/test/resources/conf/config.yml"));
         entity = new BasicHttpEntity();
         entity.setContent(new FileInputStream("src/test/resources/json/ClusterNode.json"));
+        PowerMockito.mockStatic(MetricPathUtils.class);
     }
 
     @Test
@@ -68,6 +78,8 @@ public class ClusterAndNodeMetricsTest{
         when(statusLine.getStatusCode()).thenReturn(200);
         when(response.getStatusLine()).thenReturn(statusLine);
         when(response.getEntity()).thenReturn(entity);
+
+        when(MetricPathUtils.buildMetricPath(Mockito.anyString(),Mockito.anyString())).thenReturn("Custom Metrics|CouchBase|Cluster1|nodes|172.17.0.2;8091");
 
         Map<String, ?> metricsMap = (Map<String, ?>)conf.get("metrics");
         ClusterAndNodeMetrics clusterAndNodeMetrics = new ClusterAndNodeMetrics(contextConfiguration, metricWriteHelper,"cluster1", "localhost:8090", metricsMap, latch);

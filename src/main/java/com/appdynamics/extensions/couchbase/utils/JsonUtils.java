@@ -10,6 +10,7 @@ package com.appdynamics.extensions.couchbase.utils;
 import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.util.AssertUtils;
+import com.appdynamics.extensions.util.MetricPathUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 
@@ -47,7 +48,8 @@ public class JsonUtils {
                 String nodeOrBucketname = node.get("hostname") == null ? (node.get("name") == null ? null : node.get("name").asText()) : node.get("hostname").asText();
                 nodeSet.add(nodeOrBucketname);
                 if (sectionMetricsList != null) {
-                    metricList.addAll(getMetrics(metricPath + METRIC_SEPARATOR + nodeOrBucketname + METRIC_SEPARATOR + section, sectionMetricsList, node.get(section) == null ? node : node.get(section)));
+                    String path = MetricPathUtils.buildMetricPath(metricPath,nodeOrBucketname);
+                    metricList.addAll(getMetrics(path + METRIC_SEPARATOR + section, sectionMetricsList, node.get(section) == null ? node : node.get(section)));
                 } else {
                     logger.debug("The {} section does not have any metrics specified in config.yml", section);
                 }
@@ -79,7 +81,7 @@ public class JsonUtils {
         return metricList;
     }
 
-    public static List<Metric> getMetricsFromArray(String metricPath, List<Map<String, ?>> metricsList, JsonNode jsonNode) {
+    public static List<Metric> getMetricsFromArray(String metricPath, String bucketName, List<Map<String, ?>> metricsList, JsonNode jsonNode) {
         AssertUtils.assertNotNull(metricsList, "The metricsList passed is either null or empty");
         AssertUtils.assertNotNull(jsonNode, "The jsonNode passed is either null or empty");
         List<Metric> metricList = Lists.newArrayList();
@@ -90,10 +92,11 @@ public class JsonUtils {
             if (jsonValue != null && jsonValue.isArray()) {
                 JsonNode lastValueNode = jsonValue.get(jsonValue.size() - 1);
                 Metric individualMetric;
+                String path = MetricPathUtils.buildMetricPath(metricPath,bucketName);
                 if (metricProperties != null) {
-                    individualMetric = new Metric(metricName, lastValueNode.asText(), metricPath + METRIC_SEPARATOR + metricName, metricProperties);
+                    individualMetric = new Metric(metricName, lastValueNode.asText(), path + METRIC_SEPARATOR + metricName, metricProperties);
                 } else {
-                    individualMetric = new Metric(metricName, lastValueNode.asText(), metricPath + METRIC_SEPARATOR + metricName);
+                    individualMetric = new Metric(metricName, lastValueNode.asText(), path + METRIC_SEPARATOR + metricName);
                 }
                 metricList.add(individualMetric);
             } else {

@@ -1,3 +1,5 @@
+## 2.0.4
+* Fixed issue for metric path when colon is present using metricPathReplacements
 
 ## 2.0.3
 * Moved to commons 2.2.4 version
