@@ -16,7 +16,7 @@ servers:
     queryPort: "8093"
     username: "Administrator"
     password: "password1"
-    passwordEncrypted: ""
+    encryptedPassword: ""
 
 #Encryption key for Encrypted password.
 encryptionKey: ""
@@ -281,5 +281,9 @@ metrics:
             - maxRollbackPoints:
                   alias: "maxRollbackPoints"
 
-
+metricPathReplacements:
+  - replace: ":"
+    replaceWith: ";"
+  - replace: "|"
+    replaceWith: "="
 

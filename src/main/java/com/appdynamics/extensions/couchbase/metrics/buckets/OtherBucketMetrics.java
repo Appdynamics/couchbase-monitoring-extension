@@ -71,7 +71,7 @@ class OtherBucketMetrics implements Runnable {
             JsonNode opJsonNode = rootJsonNode.get("op");
             if (opJsonNode != null) {
                 JsonNode sampleJsonNode = opJsonNode.get("samples");
-                individualBucketMetricsList.addAll(getMetricsFromArray(contextConfiguration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "buckets" + METRIC_SEPARATOR + bucketName, otherBucketMetricsList, sampleJsonNode));
+                individualBucketMetricsList.addAll(getMetricsFromArray(contextConfiguration.getMetricPrefix() + METRIC_SEPARATOR + clusterName + METRIC_SEPARATOR + "buckets", bucketName, otherBucketMetricsList, sampleJsonNode));
             }
         }
         return individualBucketMetricsList;

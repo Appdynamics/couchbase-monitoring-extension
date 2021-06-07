@@ -1,3 +1,8 @@
+## 2.0.4
+* Fixed issue for metric path when colon is present using metricPathReplacements
+
+## 2.0.3
+* Moved to commons 2.2.4 version
 
 ## 2.0.2
 * Fixed the latch countdown issue for XDCR metrics.
