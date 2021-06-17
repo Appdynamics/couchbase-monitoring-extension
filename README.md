@@ -215,30 +215,41 @@ To avoid setting the clear text password in the config.yml, please follow the st
 |stableSnapshotInterval  			|How often the indexer creates a persistent snapshot of recovery
 |maxRollbackPoints         		|Maximum number of rollback points
 
-## Workbench
-Workbench is a feature by which you can preview the metrics before registering it with the controller. This is useful if you want to fine tune the configurations. Workbench is embedded into the extension jar.
-To use the workbench, follow all the steps in installation and configuration.
+## Credentials Encryption ##
 
-1. Start the workbench with the following command if you are in &lt;MACHINE_AGENT_HOME&gt;
+Please visit [Encryption Guidelines] (https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-Password-Encryption-with-Extensions/ta-p/29397) to get detailed instructions on password encryption. The steps in this document will guide you through the whole process.
+If you want to use password encryption, please send arguments as connectionProperties. You will have to fill in the encrypted Password and Encryption Key fields in the config but you will also have to give an empty "" value to the password field and the encrypted password will be automatically picked up.
 
-```
-      java -jar /monitors/CouchBaseMonitor/couchbase-monitoring-extension.jar 
-```      
-This starts an http server at http://host:9090/. This can be accessed from the browser.
+## Extensions Workbench ##
+Workbench is an inbuilt feature provided with each extension in order to assist you to fine tune the extension setup before you actually
+ deploy it on the controller. Please review the following document on [How to use the Extensions WorkBench ] (https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-the-Extensions-WorkBench/ta-p/30130)
 
-2. If the server is not accessible from outside/browser, you can use the following end points to see the list of registered metrics and errors.
+## Troubleshooting ##
 
-    Get the stats
-    ```
-    curl http://localhost:9090/api/stats
-    ```
-    Get the registered metrics
-    ```
-    curl http://localhost:9090/api/metric-paths
-    ```
-You can make the changes to config.yml and validate it from the browser or the API
+Please follow the steps listed in this [troubleshooting-document] (https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) in order to troubleshoot your issue. 
+These are a set of common issues that customers might have faced during the installation of the extension. 
+If these don't solve your issue, please follow the last step on the [troubleshooting-document] (https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) to contact the support team.
 
-3. Once the configuration is complete, you can kill the workbench and start the Machine Agent.
+
+ ## Support Tickets
+If after going through the [Troubleshooting Document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) you have not been able to get your extension working, please file a ticket and add the following information.
+
+Please provide the following in order for us to assist you better.
+
+    1. Stop the running machine agent.
+    2. Delete all existing logs under <MachineAgent>/logs.
+    3. Please enable debug logging by editing the file <MachineAgent>/conf/logging/log4j.xml. Change the level value of the following <logger> elements to debug.
+        <logger name="com.singularity">
+        <logger name="com.appdynamics">
+    4. Start the machine agent and please let it run for 10 mins. Then zip and upload all the logs in the directory <MachineAgent>/logs/*.
+    5. Attach the zipped <MachineAgent>/conf/* directory here.
+    6. Attach the zipped <MachineAgent>/monitors/ExtensionFolderYouAreHavingIssuesWith directory here.
+
+For any support related questions, you can also contact help@appdynamics.com.
+
+## Contributing
+
+Always feel free to fork and contribute any changes directly here on [GitHub](https://github.com/Appdynamics/couchbase-monitoring-extensio).
 
 ## Version
 
@@ -250,16 +261,3 @@ You can make the changes to config.yml and validate it from the browser or the A
 
 ##### 2.0.2 - Fixed the latch countdown issue for XDCR metrics. MA v20.3.0+ compatibility update.
 ##### 2.0.0 - Revamped the extension to support new extensions framework(2.0.0), Added 3 different categories of metrics(query, xdcr and index), Added extra metrics in cluster, node and bucket categories.
-
-## Troubleshooting
-Please follow the steps specified in the [TROUBLESHOOTING](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) document to debug problems faced while using the extension.
-
-## Contributing
-
-Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/couchbase-monitoring-extension).
-
-## Community
-Find out more in the [AppSphere](https://www.appdynamics.com/community/exchange/extension/couchbase-monitoring-extension/) community.
-
-## Support
-For any questions or feature request, please contact [AppDynamics Support](mailto:help@appdynamics.com).
