@@ -226,7 +226,7 @@ Workbench is an inbuilt feature provided with each extension in order to assist 
 
 ## Troubleshooting ##
 
-Please follow the steps listed in this [troubleshooting-document] (https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) in order to troubleshoot your issue. 
+Please follow the steps listed in this [troubleshooting-document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) in order to troubleshoot your issue. 
 These are a set of common issues that customers might have faced during the installation of the extension. 
 If these don't solve your issue, please follow the last step on the [troubleshooting-document] (https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) to contact the support team.
 
