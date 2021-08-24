@@ -228,24 +228,6 @@ Workbench is an inbuilt feature provided with each extension in order to assist 
 
 Please follow the steps listed in this [troubleshooting-document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) in order to troubleshoot your issue. 
 These are a set of common issues that customers might have faced during the installation of the extension. 
-If these don't solve your issue, please follow the last step on the [troubleshooting-document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) to contact the support team.
-
-
- ## Support Tickets
-If after going through the [Troubleshooting Document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) you have not been able to get your extension working, please file a ticket and add the following information.
-
-Please provide the following in order for us to assist you better.
-
-    1. Stop the running machine agent.
-    2. Delete all existing logs under <MachineAgent>/logs.
-    3. Please enable debug logging by editing the file <MachineAgent>/conf/logging/log4j.xml. Change the level value of the following <logger> elements to debug.
-        <logger name="com.singularity">
-        <logger name="com.appdynamics">
-    4. Start the machine agent and please let it run for 10 mins. Then zip and upload all the logs in the directory <MachineAgent>/logs/*.
-    5. Attach the zipped <MachineAgent>/conf/* directory here.
-    6. Attach the zipped <MachineAgent>/monitors/ExtensionFolderYouAreHavingIssuesWith directory here.
-
-For any support related questions, you can also contact help@appdynamics.com.
 
 ## Contributing
 
@@ -253,12 +235,11 @@ Always feel free to fork and contribute any changes directly here on [GitHub](ht
 
 ## Version
 
-|                              |           |      
-|------------------------------|-----------|
-|Current version               |2.0.4      |
-|CouchBase version tested on   |6.5.1        |
-|Last Update                   |18/02/2021 |
-
-##### 2.0.3 - Moved to commons 2.2.4 version
-##### 2.0.2 - Fixed the latch countdown issue for XDCR metrics. MA v20.3.0+ compatibility update.
-##### 2.0.0 - Revamped the extension to support new extensions framework(2.0.0), Added 3 different categories of metrics(query, xdcr and index), Added extra metrics in cluster, node and bucket categories.
+|            Name              |       Version      |      
+|------------------------------|--------------------|
+|Extension version             |2.0.4               |
+|Controller Compatibility      |4.5 and above       |
+|Agent Compatibility           |4.5.13 and above    |
+|CouchBase version tested on   |6.5.1               |
+|Last Update                   |18/02/2021          |
+|Changelist                    |[Changelog](https://github.com/Appdynamics/couchbase-monitoring-extension/blob/master/CHANGELOG.md)|
