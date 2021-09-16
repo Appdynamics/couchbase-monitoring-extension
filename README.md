@@ -4,13 +4,19 @@
 Couchbase Server is an open source, distributed (shared-nothing architecture) NoSQL document-oriented database that is optimized for interactive applications. This extension allows the user to connect to a specific cluster host and retrieve metrics about the cluster, all the nodes within the cluster and any buckets associated with the nodes.
 
 ## Prerequisites
-1. This extension works only with the standalone Java machine agent. The extension requires the machine agent to be up and running.
-2. This extension creates a client to the CouchBase server that needs to be monitored. So the CouchBase server that has to be monitored, should be available for access from the machine that has the extension installed.
-3. The client created through the extension uses various REST endpoints provided by the CouchBase server to retrieve metrics.
-Please make sure your user account has proper admin role to access all the [REST endpoints](https://developer.couchbase.com/documentation/server/5.0/rest-api/rest-endpoints-all.html). "Full" and "Cluster" level roles gives you access to all the REST endpoints.
+1. Before the extension is installed, the prerequisites mentioned [here](https://community.appdynamics.com/t5/Knowledge-Base/Extensions-Prerequisites-Guide/ta-p/35213) need to be met. Please do not proceed with the extension installation if the specified prerequisites are not met.
+2. The client created through the extension uses various REST endpoints provided by the CouchBase server to retrieve metrics.
+Please make sure your user account has proper admin role to access all the [REST endpoints](https://docs.couchbase.com/server/current/rest-api/rest-endpoints-all.html). "Full" and "Cluster" level roles gives you access to all the REST endpoints.
+3. The extension needs to be able to connect to the CouchBase server in order to collect and send metrics. To do this, you will have to either establish a remote connection in between the extension and the product, or have an agent on the same machine running the product in order for the extension to collect and send the metrics.
 
 ## Installation
-1. Unzip the contents of "CouchBaseMonitor.zip" as "CouchBaseMonitor" and copy the "CouchBaseMonitor" directory to `<MACHINE_AGENT_HOME>/monitors/`
+
+1. Run 'mvn clean install' from "CouchBaseMonitorRepo"
+2. Unzip the `CouchBaseMonitor-<version>.zip` from `target` directory into the "<MachineAgent_Dir>/monitors" directory.
+3. Edit the file config.yml located at <MachineAgent_Dir>/monitors/CouchBaseMonitor The metricPrefix of the extension has to be configured as specified [here](https://community.appdynamics.com/t5/Knowledge-Base/How-do-I-troubleshoot-missing-custom-metrics-or-extensions/ta-p/28695#Configuring%20an%20Extension). Please make sure that the right metricPrefix is chosen based on your machine agent deployment, otherwise this could lead to metrics not being visible in the controller.
+4. Restart the Machine Agent.
+
+Please place the extension in the **"monitors"** directory of your **Machine Agent** installation directory. Do not place the extension in the **"extensions"** directory of your **Machine Agent** installation directory.
 
 ## Recommendations
 It is recommended that a single CouchBase monitoring extension be used to monitor a single CouchBase cluster.
@@ -25,6 +31,7 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
      ```
      metricPrefix: "Server|Component:Extensions tier|Custom Metrics|CouchBase"
      ```
+More details around metric prefix can be found [here](https://community.appdynamics.com/t5/Knowledge-Base/How-do-I-troubleshoot-missing-custom-metrics-or-extensions/ta-p/28695).
 
   2. Configure the CouchBase cluster by specifying the name(required), host(required), port(required), queryPort(required) of  any node(server) in the CouchBase cluster, username(only if authentication enabled), password(only if authentication enabled), passwordEncrypted(only if password encryption required).
 
@@ -37,10 +44,10 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
           queryPort: "8093"
           username: "Administrator"
           password: "password1"
-          passwordEncrypted: ""
+          encryptedPassword: ""
      ```
 
-  3. Configure the encryptionKey for passwordEncrypted(only if password encryption required). See next section for encrypting password.
+  3. Configure the encryptionKey for encryptedPassword(only if password encryption required). See next section for encrypting password.
 
      For example,
      ```
@@ -48,7 +55,7 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
      encryptionKey: "axcdde43535hdhdgfiniyy576"
      ```
   
-  4. Configure the controllerInfo section
+  4. Configure the controllerInfo section (optional)<br/>
      For example,
      ```
      controllerInfo:
@@ -66,9 +73,9 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
      |     Property      |   Default value |         Possible values         |                                              Description                                                                                                |
      | :---------------- | :-------------- | :------------------------------ | :------------------------------------------------------------------------------------------------------------- |
      | alias             | metric name     | Any string                      | The substitute name to be used in the metric browser instead of metric name.                                   |
-     | aggregationType   | "AVERAGE"       | "AVERAGE", "SUM", "OBSERVATION" | [Aggregation qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)    |
-     | timeRollUpType    | "AVERAGE"       | "AVERAGE", "SUM", "CURRENT"     | [Time roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)   |
-     | clusterRollUpType | "INDIVIDUAL"    | "INDIVIDUAL", "COLLECTIVE"      | [Cluster roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)|
+     | aggregationType   | "AVERAGE"       | "AVERAGE", "SUM", "OBSERVATION" | [Aggregation qualifier](https://docs.appdynamics.com/display/latest/Build+a+Monitoring+Extension+Using+Java)    |
+     | timeRollUpType    | "AVERAGE"       | "AVERAGE", "SUM", "CURRENT"     | [Time roll-up qualifier](https://docs.appdynamics.com/display/latest/Build+a+Monitoring+Extension+Using+Java)   |
+     | clusterRollUpType | "INDIVIDUAL"    | "INDIVIDUAL", "COLLECTIVE"      | [Cluster roll-up qualifier](https://docs.appdynamics.com/display/latest/Build+a+Monitoring+Extension+Using+Java)|
      | multiplier        | 1               | Any number                      | Value with which the metric needs to be multiplied.                                                            |
      | convert           | null            | Any key value map               | Set of key value pairs that indicates the value to which the metrics need to be transformed. eg: UP:0, DOWN:1  |
      | delta             | false           | true, false                     | If enabled, gives the delta values of metrics instead of actual values.                                        |
@@ -102,19 +109,6 @@ Configure the CouchBase monitoring extension by editing the config.yml file in `
             - maxRollbackPoints:
                   alias: "maxRollbackPoints"
      ```
-     
-## Password encryption
-To avoid setting the clear text password in the config.yml, please follow the steps below to encrypt the password and set the encrypted password and the key in the config.yml:
-1. Download the util jar to encrypt the password from [here](https://github.com/Appdynamics/maven-repo/raw/master/releases/com/appdynamics/appd-exts-commons/2.0.0/appd-exts-commons-2.0.0.jar).
-2. Encrypt password from the command line using the following command :
-   ```
-   java -cp "appd-exts-commons-2.0.0.jar" com.appdynamics.extensions.crypto.Encryptor myKey myPassword
-   ```
-   where "myKey" is any random key,
-         "myPassword" is the actual password that needs to be encrypted
-3. Add the values for "encryptionKey", "passwordEncrypted" in the config.yml. 
-   The value for "encryptionKey" is the value substituted for "myKey" in the above command.
-   The value for "passwordEncrypted" is the result of the above command.
      
 ## Metrics
 
@@ -238,8 +232,8 @@ Always feel free to fork and contribute any changes directly here on [GitHub](ht
 |            Name              |       Version      |      
 |------------------------------|--------------------|
 |Extension version             |2.0.4               |
-|Controller Compatibility      |4.5 and above       |
-|Agent Compatibility           |4.5.13 and above    |
 |CouchBase version tested on   |6.5.1               |
 |Last Update                   |18/02/2021          |
 |Changelist                    |[Changelog](https://github.com/Appdynamics/couchbase-monitoring-extension/blob/master/CHANGELOG.md)|
+
+**Note**: While extensions are maintained and supported by customers under the open-source licensing model, they interact with agents and Controllers that are subject to [AppDynamics’ maintenance and support policy](https://docs.appdynamics.com/latest/en/product-and-release-announcements/maintenance-support-for-software-versions). Some extensions have been tested with AppDynamics 4.5.13+ artifacts, but you are strongly recommended against using versions that are no longer supported.
